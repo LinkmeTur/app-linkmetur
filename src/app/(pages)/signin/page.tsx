@@ -3,8 +3,13 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, Link } from '@mui/material';
 import Image from 'next/image';
+import { useAppDispatch } from '@/app/store/hooks/hooks';
+import signin from '@/app/store/reducers/auth/thunks/signin.thunk';
+import { useRouter } from 'next/navigation';
 
 export default function Signin() {
+    const dispatch = useAppDispatch();
+    const route = useRouter();
     const [inputValue, setInputValue] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -13,27 +18,34 @@ export default function Signin() {
         setInputValue(event.target.value);
     };
 
-    const getPasswordError = (value: string) => {
-        if (value.length < 4) return 'Senha deve ter pelo menos 4 caracteres';
-        if (!/[A-Z]/.test(value)) return 'Senha precisa de pelo menos uma letra maiúscula';
-        if (!/[^a-zA-Z0-9]/.test(value)) return 'Senha precisa de pelo menos um símbolo';
-        return null;
-    };
+    // const getPasswordError = (value: string) => {
+    //     if (value.length < 4) return 'Senha deve ter pelo menos 4 caracteres';
+    //     if (!/[A-Z]/.test(value)) return 'Senha precisa de pelo menos uma letra maiúscula';
+    //     if (!/[^a-zA-Z0-9]/.test(value)) return 'Senha precisa de pelo menos um símbolo';
+    //     return null;
+    // };
 
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const newErrors: Record<string, string> = {};
+        // const newErrors: Record<string, string> = {};
 
-        const passwordError = getPasswordError(password);
-        if (passwordError) newErrors.password = passwordError;
+        // const passwordError = getPasswordError(password);
+        // if (passwordError) newErrors.password = passwordError;
 
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
-        }
+        // if (Object.keys(newErrors).length > 0) {
+        //     setErrors(newErrors);
+        //     return;
+        // }
 
         setErrors({});
         console.log({ inputValue, password });
+        dispatch(signin({ email: inputValue, senha: password }))
+            .unwrap()
+            .then(() => {
+                setInputValue('');
+                setPassword('');
+                route.push('/dashboard');
+            });
     };
 
     return (

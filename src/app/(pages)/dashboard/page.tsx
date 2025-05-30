@@ -1,11 +1,17 @@
 'use client';
+
+import { Box, Typography } from '@mui/material';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import CadMetrics from './components/carMetrics';
+
 export default function Dashboard() {
     return (
-        <div id='dashboard-content' className='p-6'>
+        <PageContainer title={'Dashboard'.toUpperCase()} breadcrumbs={[]}>
             <section id='key-metrics' className='mb-8'>
-                <h2 className='text-lg font-semibold text-gray-800 mb-4'>Métricas-chave</h2>
+                <Typography className='text-lg font-semibold mb-4'>Métricas-chave</Typography>
 
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+                <Box className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+                    <CadMetrics />
                     <div id='metric-profile-views' className='bg-white rounded-lg shadow p-5'>
                         <div className='flex items-center justify-between'>
                             <div>
@@ -87,7 +93,7 @@ export default function Dashboard() {
                             </span>
                         </div>
                     </div>
-                </div>
+                </Box>
             </section>
 
             <section id='quick-actions' className='mb-8'>
@@ -359,6 +365,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             </section>
-        </div>
+        </PageContainer>
     );
 }
