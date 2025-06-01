@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { PhotoCamera, Delete, Info } from '@mui/icons-material';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { useActivePage } from '@toolpad/core/useActivePage';
 import { ChangeEvent, FC, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers-pro/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
@@ -212,8 +213,14 @@ const ShiftsSection: FC = () => {
 };
 
 export default function RegisterService() {
+    const activePage = useActivePage();
+    alert(JSON.stringify(activePage?.breadcrumbs));
     return (
-        <PageContainer className='w-full px-6'>
+        <PageContainer
+            title=''
+            breadcrumbs={activePage?.breadcrumbs.filter((p) => p.path !== '/')}
+            className='w-full px-6'
+        >
             <Paper elevation={2} className=' rounded-lg  p-6 mb-6'>
                 <Box sx={{ p: 2, display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Box

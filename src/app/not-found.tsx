@@ -21,7 +21,7 @@ export default function NotFound() {
             <Box
                 sx={{
                     width: '50%',
-                    height: '100%',
+                    height: '50%',
                     display: 'flow',
                     float: 'right',
                     zIndex: 9,
@@ -30,11 +30,11 @@ export default function NotFound() {
                 <Box
                     sx={{
                         position: 'absolute',
-                        bottom: '-4rem',
-                        right: '-5rem',
+                        bottom: '4rem',
+                        right: '1rem',
                     }}
                 >
-                    <Image src={'/logoblackp.svg'} alt='linkme' width={600} height={100} />
+                    <Image src={'/logoblackp.svg'} alt='linkme' width={450} height={100} />
                 </Box>
             </Box>
             <Box

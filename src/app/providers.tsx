@@ -1,9 +1,9 @@
 'use client';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { CssBaseline, Theme, ThemeProvider } from '@mui/material';
+import { CssBaseline, Divider, IconButton, Theme, ThemeProvider, Typography } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { Suspense, useEffect, useState } from 'react';
+import { JSX, Suspense, useEffect, useState } from 'react';
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import LinearProgress from '@mui/material/LinearProgress';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
@@ -16,6 +16,8 @@ import {
 import useStore, { persistor } from './store/store';
 import Image from 'next/image';
 import { LicenseInfo } from '@mui/x-license';
+import LinkmeTurAppBar from './components/appBar/appbar';
+import { IoMoon, IoSunny } from 'react-icons/io5';
 
 LicenseInfo.setLicenseKey(
     '1919867ea7d28016281f8bfff8ea8d58Tz02NDc0LEU9MjAwMzc4MTg0ODAwMCxTPXByZW1pdW0sTE09c3Vic2NyaXB0aW9uLEtWPTI=',
@@ -45,10 +47,22 @@ const istheme = {
 
 export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }) {
     const [thisTheme, setThisTheme] = useState<Theme>(themeDark);
+    const [logo, setLogo] = useState<boolean>(false);
     const [showLayoutDashboard, setShowLayoutDashboard] = useState<boolean>(false);
 
-    const [dashboardLayoutNavigation, setDashboardLayoutNavigation] =
-        useState(LinkMeTurNavigationP);
+    const [dashboardLayoutNavigation, setDashboardLayoutNavigation] = useState<
+        Array<{
+            segment?: string;
+            title: string;
+            icon: JSX.Element;
+            children?: Array<{
+                segment: string;
+                title: string;
+                icon: JSX.Element;
+            }>;
+        }>
+    >(LinkMeTurNavigationP);
+    const [titleTab, setTitleTab] = useState('');
 
     const pathname = usePathname();
 
@@ -59,8 +73,10 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                 isDarkMode ? istheme.setTheme('dark') : istheme.setTheme('light'),
             );
         } else if (themeMode === 'dark') {
+            setLogo(false);
             setThisTheme(themeDark);
         } else {
+            setLogo(true);
             setThisTheme(themelight);
         }
     }, []);
@@ -72,15 +88,29 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
             setDashboardLayoutNavigation(LinkMeTurNavigationP);
         }
         const show = dashboardLayoutNavigation.findIndex(
-            (s) => pathname === '/' + s.segment || pathname.includes(`/${s.segment}/`),
+            (s) =>
+                pathname === '/' + s.segment ||
+                pathname.includes(`/${s.segment}/`) ||
+                (!s.segment && s.children?.map((c) => '/' + c.segment).includes(pathname)),
         );
 
-        if (show >= 0) {
-            setShowLayoutDashboard(true);
-        } else {
+        if (show < 0) {
             setShowLayoutDashboard(false);
+            return;
         }
-    }, [pathname]);
+
+        setShowLayoutDashboard(true);
+        const page = dashboardLayoutNavigation[show];
+        if (pathname === '/' + page.segment) {
+            setTitleTab(page.title);
+        } else if (page.children) {
+            const child = page.children.find((c) => '/' + c.segment === pathname)?.title;
+
+            setTitleTab(child ?? '');
+        } else {
+            setTitleTab('');
+        }
+    }, [dashboardLayoutNavigation, pathname]);
     return (
         <Provider store={useStore}>
             <PersistGate loading={null} persistor={persistor}>
@@ -94,21 +124,63 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                 >
                                     <DashboardLayout
                                         branding={{
-                                            title: `${
-                                                dashboardLayoutNavigation.find(
-                                                    (l) => '/' + l.segment === pathname,
-                                                )?.title
-                                            }`,
-                                            logo: (
+                                            title: `${titleTab}`,
+                                            logo: !logo ? (
                                                 <Image
-                                                    src='/logoblackp.svg'
+                                                    src={'/logoblackp.svg'}
                                                     alt='Logo'
-                                                    width={200}
-                                                    height={200}
+                                                    width={150}
+                                                    height={100}
+                                                />
+                                            ) : (
+                                                <Image
+                                                    src={'/logowhitep.svg'}
+                                                    alt='Logo'
+                                                    width={150}
+                                                    height={100}
                                                 />
                                             ),
                                         }}
-                                        slots={{}}
+                                        slots={{
+                                            toolbarActions: () => (
+                                                <>
+                                                    <LinkmeTurAppBar />
+                                                    <IconButton
+                                                        onClick={() => {
+                                                            if (istheme.getTheme() === 'dark') {
+                                                                istheme.setTheme('light');
+                                                                setLogo(true);
+                                                                setThisTheme(themelight);
+                                                            } else {
+                                                                istheme.setTheme('dark');
+                                                                setLogo(false);
+                                                                setThisTheme(themeDark);
+                                                            }
+                                                        }}
+                                                        color='primary'
+                                                    >
+                                                        {logo ? <IoMoon /> : <IoSunny />}
+                                                    </IconButton>
+                                                </>
+                                            ),
+                                            sidebarFooter: ({ mini }) => (
+                                                <>
+                                                    <Divider />
+                                                    <Typography
+                                                        variant='caption'
+                                                        sx={{
+                                                            m: 1,
+                                                            textAlign: 'center',
+                                                            overflow: 'hidden',
+                                                        }}
+                                                    >
+                                                        {mini
+                                                            ? '© 2025'
+                                                            : `© 2025 Desenvolvido por Linkme Tur.`}
+                                                    </Typography>
+                                                </>
+                                            ),
+                                        }}
                                     >
                                         {children}
                                     </DashboardLayout>
