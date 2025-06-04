@@ -27,6 +27,10 @@ import twoFactorRequest from '@/app/store/reducers/auth/thunks/twoFactor.thunk';
 import { clearUserState, TUserPass } from '@/app/store/reducers/user/user.slice';
 import createCorporation from '@/app/store/reducers/corporation/thunks/createCorporation.thunk';
 import { useRouter } from 'next/navigation';
+import { formatCNPJ } from '@/app/config/functions/formatCNPJ';
+import { formatPhone } from '@/app/config/functions/formatPhone';
+import { cleanCaracters } from '@/app/config/functions/cleanCaracters';
+import { formatCep } from '@/app/config/functions/formatCep';
 
 const tiposCorporacoes = [
     {
@@ -46,7 +50,6 @@ const tiposCorporacoes = [
 
 export default function Register() {
     const dispatch = useAppDispatch();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const router = useRouter();
     const corpState = useAppSelector((state) => state.corporation);
     const { twoFactorCode } = useAppSelector((state) => state.auth);
@@ -88,8 +91,6 @@ export default function Register() {
         setIsEditing(!isEditing);
     };
     const handleValidar = () => {
-        console.log(factor);
-        console.log(otp);
         if (factor === otp) {
             nextStep();
         } else {
@@ -101,23 +102,27 @@ export default function Register() {
         const userMaster: Partial<TUserPass> = {
             nome,
             email,
-            telefone: phone,
+            telefone: cleanCaracters(phone),
             senha: password,
             nivel: 1,
         };
-        alert(JSON.stringify(userMaster));
+
         const companyMaster: Partial<TCorporation> = {
             ...companyData,
+            telefone: cleanCaracters(companyData?.telefone as string),
+            cnpj: cleanCaracters(companyData?.cnpj as string),
+            cep: cleanCaracters(companyData?.cep as string),
             tipo: typeCorp,
             localizacao: JSON.stringify(companyData?.localizacao),
         };
-        alert(JSON.stringify(companyMaster));
+
         dispatch(createCorporation({ corp: companyMaster, user: userMaster })).then(() => {
             dispatch(clearCorporationState());
             dispatch(clearUserState());
             router.push('/signin');
         });
     };
+
     return (
         <Box sx={{ height: '100vh', bgcolor: 'white', display: 'flex', flexDirection: 'column' }}>
             <AppBar sx={{ height: '10%' }} variant='elevation' position='static'>
@@ -195,14 +200,18 @@ export default function Register() {
                             <TextField
                                 label='Digite seu CNPJ'
                                 fullWidth
-                                value={cnpj}
+                                value={formatCNPJ(cnpj)}
                                 onChange={(e) => setCnpj(e.target.value)}
                             />
                             <Button
                                 variant='contained'
                                 fullWidth
                                 sx={{ mt: 2 }}
-                                onClick={() => dispatch(consultCNPJ(cnpj)).unwrap().then(nextStep)}
+                                onClick={() =>
+                                    dispatch(consultCNPJ(cnpj.replace(/\D/g, '')))
+                                        .unwrap()
+                                        .then(nextStep)
+                                }
                             >
                                 Buscar Dados
                             </Button>
@@ -226,7 +235,11 @@ export default function Register() {
                                 <TextField
                                     label={'CNPJ'}
                                     name={'cnpj'}
-                                    value={companyData.cnpj}
+                                    value={
+                                        companyData.cnpj
+                                            ? formatCNPJ(companyData.cnpj)
+                                            : companyData.cnpj
+                                    }
                                     onChange={handleChange}
                                     margin='dense'
                                     disabled
@@ -279,7 +292,11 @@ export default function Register() {
                                 <TextField
                                     label={'Telefone'}
                                     name={'telefone'}
-                                    value={companyData.telefone}
+                                    value={
+                                        companyData.telefone
+                                            ? formatPhone(companyData.telefone)
+                                            : ''
+                                    }
                                     onChange={handleChange}
                                     margin='dense'
                                     disabled={!isEditing}
@@ -302,7 +319,11 @@ export default function Register() {
                                     className='w-[9rem]'
                                     label={'Cep'}
                                     name={'cep'}
-                                    value={companyData.cep}
+                                    value={
+                                        companyData.cep
+                                            ? formatCep(companyData.cep)
+                                            : companyData.cep
+                                    }
                                     onChange={handleChange}
                                     margin='dense'
                                     disabled={!isEditing}

@@ -3,17 +3,9 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 class AxiosHTTP {
     private readonly axiosInstance: AxiosInstance;
 
-    setBaseURL() {
-        if (process.env.NODE_ENV === 'development') {
-            return 'http://[::1]:8081'; // porta local
-        } else {
-            return 'https://linkmetur-api.onrender.com'; //colocar o endereço do servidor
-        }
-    }
-
     init() {
         return axios.create({
-            baseURL: this.setBaseURL(),
+            baseURL: 'https://linkmetur-api.vercel.app',
         });
     }
 

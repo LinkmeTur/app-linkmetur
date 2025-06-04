@@ -1,6 +1,5 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
-import Image from 'next/image';
 
 export function TProfile() {
     return (

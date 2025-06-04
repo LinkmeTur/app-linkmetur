@@ -27,9 +27,18 @@ const commonAppslice = createSlice({
         clearState: () => {
             return initialState;
         },
+        setloading: (state, action) => {
+            state.loading = action.payload;
+        },
+        setModal: (state, action) => {
+            state.modal = action.payload;
+        },
+        setNotifications: (state, action) => {
+            state.notifications = action.payload;
+        },
     },
     extraReducers() {},
 });
 
-export const { clearState } = commonAppslice.actions;
+export const { clearState, setloading, setModal, setNotifications } = commonAppslice.actions;
 export default commonAppslice.reducer;

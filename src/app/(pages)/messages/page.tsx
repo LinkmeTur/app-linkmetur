@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Box, Paper } from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
 
