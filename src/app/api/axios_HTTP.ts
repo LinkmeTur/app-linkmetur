@@ -5,8 +5,8 @@ class AxiosHTTP {
 
     init() {
         return axios.create({
-            // baseURL: 'https://linkmetur-api.vercel.app',
-            baseURL: 'http://localhost:8081',
+            baseURL: 'https://linkmetur-api.vercel.app',
+            // baseURL: 'http://localhost:8081',
         });
     }
 

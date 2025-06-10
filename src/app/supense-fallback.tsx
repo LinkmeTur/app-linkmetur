@@ -1,5 +1,4 @@
 'use client';
-
 import { ReactNode, Suspense, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store/hooks/hooks';
 import { Alert, CircularProgress, Modal } from '@mui/material';

@@ -128,14 +128,14 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                             title: `${titleTab}`,
                                             logo: !logo ? (
                                                 <Image
-                                                    src={'/logoblackp.svg'}
+                                                    src={'logoblackp.svg'}
                                                     alt='Logo'
                                                     width={150}
                                                     height={100}
                                                 />
                                             ) : (
                                                 <Image
-                                                    src={'/logowhitep.svg'}
+                                                    src={'logowhitep.svg'}
                                                     alt='Logo'
                                                     width={150}
                                                     height={100}
