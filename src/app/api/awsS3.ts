@@ -8,15 +8,13 @@ import {
 } from '@aws-sdk/client-s3';
 
 const s3 = new S3Client({
-    region: 'sa-east-1',
+    region: process.env.AWS_REGION as string,
     credentials: {
-        accessKeyId: 'AKIA3ZAELVAY62AT2EXZ',
-        secretAccessKey: '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',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
     },
     requestChecksumCalculation: 'WHEN_REQUIRED',
 });
-
-// const upload = multer()
 
 export async function sendFileS3(key: string, file: File) {
     const params = {
