@@ -23,28 +23,6 @@ LicenseInfo.setLicenseKey(
     '1919867ea7d28016281f8bfff8ea8d58Tz02NDc0LEU9MjAwMzc4MTg0ODAwMCxTPXByZW1pdW0sTE09c3Vic2NyaXB0aW9uLEtWPTI=',
 );
 
-const detectDarkMode = (callback: (isDark: boolean) => void) => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const handleChange = (event: MediaQueryListEvent) => {
-        callback(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-
-    // Executa inicialmente
-    callback(mediaQuery.matches);
-
-    return () => {
-        mediaQuery.removeEventListener('change', handleChange);
-    };
-};
-
-const istheme = {
-    setTheme: (value: string) => window.localStorage.setItem('toolpad-mode', value),
-    getTheme: () => window.localStorage.getItem('toolpad-mode'),
-};
-
 export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }) {
     const [thisTheme, setThisTheme] = useState<Theme>(themeDark);
     const [logo, setLogo] = useState<boolean>(false);
@@ -65,6 +43,28 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
     const [titleTab, setTitleTab] = useState('');
 
     const pathname = usePathname();
+    const detectDarkMode = (callback: (isDark: boolean) => void) => {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const handleChange = (event: MediaQueryListEvent) => {
+            event.preventDefault();
+            callback(event.matches);
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+
+        // Executa inicialmente
+        callback(mediaQuery.matches);
+
+        return () => {
+            mediaQuery.removeEventListener('change', handleChange);
+        };
+    };
+
+    const istheme = {
+        setTheme: (value: string) => window.localStorage.setItem('toolpad-mode', value),
+        getTheme: () => window.localStorage.getItem('toolpad-mode'),
+    };
 
     useEffect(() => {
         const themeMode = istheme.getTheme();
