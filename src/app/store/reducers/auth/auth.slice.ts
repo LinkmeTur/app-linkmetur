@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import twoFactorRequest from './thunks/twoFactor.thunk';
-import { setloading } from '../configApp/configApp.slice';
+
 import signin from '@/app/store/reducers/auth/thunks/signin.thunk';
 import { TUser } from '../user/user.slice';
 
@@ -43,24 +43,14 @@ const authSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(twoFactorRequest.pending, () => {
-            setloading(true);
-        });
-
         builder.addCase(twoFactorRequest.fulfilled, (state, action) => {
-            setloading(false);
             state.twoFactorCode = action.payload;
         });
-        builder.addCase(twoFactorRequest.rejected, () => {
-            setloading(false);
-        });
-        builder.addCase(signin.pending, () => {
-            setloading(true);
-        });
+
         builder.addCase(signin.fulfilled, (state, action) => {
-            setloading(false);
             state.secaoAtiva = true;
-            setUser(action.payload?.usuario);
+            console.log(action.payload);
+            state.usuario = action.payload?.usuario;
             state.token = action.payload?.token ?? null;
         });
     },

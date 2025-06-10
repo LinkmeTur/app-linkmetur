@@ -8,6 +8,11 @@ type CommonStateApp = {
         tranferArea: null | Array<unknown>;
     };
     notifications: string;
+    alertApp: {
+        show: boolean;
+        message: string;
+        type: 'success' | 'info' | 'warning' | 'error';
+    };
 };
 
 const initialState: CommonStateApp = {
@@ -18,6 +23,11 @@ const initialState: CommonStateApp = {
         tranferArea: null,
     },
     notifications: '',
+    alertApp: {
+        show: false,
+        message: '',
+        type: 'success',
+    },
 };
 
 const commonAppslice = createSlice({
@@ -36,9 +46,13 @@ const commonAppslice = createSlice({
         setNotifications: (state, action) => {
             state.notifications = action.payload;
         },
+        setAlertApp: (state, action) => {
+            state.alertApp = action.payload;
+        },
     },
     extraReducers() {},
 });
 
-export const { clearState, setloading, setModal, setNotifications } = commonAppslice.actions;
+export const { clearState, setloading, setModal, setNotifications, setAlertApp } =
+    commonAppslice.actions;
 export default commonAppslice.reducer;
