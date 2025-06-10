@@ -1,50 +1,40 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, Link } from '@mui/material';
 import Image from 'next/image';
-import { useAppDispatch } from '@/app/store/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
 import signin from '@/app/store/reducers/auth/thunks/signin.thunk';
 import { useRouter } from 'next/navigation';
+import { clearState } from '@/app/store/reducers/configApp/configApp.slice';
 
 export default function Signin() {
     const dispatch = useAppDispatch();
+    const { usuario, secaoAtiva } = useAppSelector((s) => s.auth);
     const route = useRouter();
     const [inputValue, setInputValue] = useState('');
     const [password, setPassword] = useState('');
-    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        if (usuario && secaoAtiva) {
+            route.push('/dashboard');
+        } else {
+            dispatch(clearState());
+        }
+    }, [secaoAtiva, usuario]);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value);
     };
 
-    // const getPasswordError = (value: string) => {
-    //     if (value.length < 4) return 'Senha deve ter pelo menos 4 caracteres';
-    //     if (!/[A-Z]/.test(value)) return 'Senha precisa de pelo menos uma letra maiúscula';
-    //     if (!/[^a-zA-Z0-9]/.test(value)) return 'Senha precisa de pelo menos um símbolo';
-    //     return null;
-    // };
-
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // const newErrors: Record<string, string> = {};
-
-        // const passwordError = getPasswordError(password);
-        // if (passwordError) newErrors.password = passwordError;
-
-        // if (Object.keys(newErrors).length > 0) {
-        //     setErrors(newErrors);
-        //     return;
-        // }
-
-        setErrors({});
         console.log({ inputValue, password });
         dispatch(signin({ email: inputValue, senha: password }))
             .unwrap()
             .then(() => {
                 setInputValue('');
                 setPassword('');
-                route.push('/dashboard');
             });
     };
 
@@ -79,8 +69,6 @@ export default function Signin() {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        // bgcolor: 'white',
-                        // color: 'black',
                     }}
                 >
                     <Image src='/linkmelp.jpeg' alt='logo linkme' width={200} height={100} />
@@ -102,8 +90,6 @@ export default function Signin() {
                             onChange={handleChange}
                             fullWidth
                             required
-                            error={!!errors.email}
-                            helperText={errors.email}
                             sx={{ zIndex: 99 }}
                         />
                         <TextField
@@ -114,8 +100,6 @@ export default function Signin() {
                             onChange={(e) => setPassword(e.target.value)}
                             fullWidth
                             required
-                            error={!!errors.password}
-                            helperText={errors.password}
                             sx={{ zIndex: 99 }}
                         />
                         <Button

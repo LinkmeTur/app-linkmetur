@@ -1,7 +1,24 @@
+/* eslint-disable @next/next/no-img-element */
+'use client';
+import { useAppSelector } from '@/app/store/hooks/hooks';
 import { Paper, Typography, Box, Avatar, Button, Chip, Grid } from '@mui/material';
-import { FaEye, FaImage, FaStar } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaEye, FaStar } from 'react-icons/fa';
 
 const PreviewSection = () => {
+    const { registerService } = useAppSelector((state) => state.jobs);
+    const { usuario } = useAppSelector((state) => state.auth);
+    const [imageFull, setImageFull] = useState('');
+    const [imageList, setImageList] = useState<{ photo_URL: string; photo_alt: string }[]>([]);
+    useEffect(() => {
+        if (registerService?.photos) {
+            setImageFull(registerService.photos[0]?.photo_URL);
+            setImageList(registerService.photos);
+        } else {
+            setImageFull('');
+            setImageList([]);
+        }
+    }, [registerService]);
     return (
         <Paper elevation={2} sx={{ borderRadius: 2, p: 3, mb: 3 }}>
             <Box display='flex' alignItems='center' mb={2}>
@@ -30,13 +47,11 @@ const PreviewSection = () => {
                 </Box>
             </Box>
 
-            <Paper sx={{ border: 1, borderColor: 'grey.200', borderRadius: 2, overflow: 'hidden' }}>
+            <Paper sx={{ border: 1, borderRadius: 2, overflow: 'hidden' }}>
                 <Box
                     sx={{
-                        backgroundColor: 'grey.100',
                         p: 2,
                         borderBottom: 1,
-                        borderColor: 'grey.200',
                     }}
                 >
                     <Typography variant='h6' color='textPrimary'>
@@ -47,10 +62,11 @@ const PreviewSection = () => {
                 <Box sx={{ p: 3 }}>
                     <Grid container spacing={3}>
                         <Grid size={{ xs: 12, md: 8 }}>
-                            <Box
+                            <Grid
+                                size={12}
                                 sx={{
                                     bgcolor: 'grey.300',
-                                    height: 130,
+                                    height: 300,
                                     borderRadius: 2,
                                     display: 'flex',
                                     alignItems: 'center',
@@ -59,17 +75,75 @@ const PreviewSection = () => {
                                     mb: 2,
                                 }}
                             >
-                                <FaImage size={40} />
-                            </Box>
+                                <img
+                                    src={imageFull}
+                                    alt='p'
+                                    style={{ height: '100%', width: '100%' }}
+                                />
+                            </Grid>
+                            <Grid size={12}>
+                                <Grid container spacing={1}>
+                                    {registerService?.photos
+                                        ? imageList.map((p) => (
+                                              <Grid size={2} key={p.photo_alt}>
+                                                  <Box
+                                                      sx={{
+                                                          bgcolor: 'grey.300',
+                                                          height: 60,
+                                                          width: 100,
+                                                          borderRadius: 2,
+                                                          display: 'flex',
+                                                          alignItems: 'center',
+                                                          justifyContent: 'center',
+                                                          color: 'grey.500',
+                                                          cursor: 'pointer',
+                                                      }}
+                                                      onClick={() => setImageFull(p.photo_URL)}
+                                                  >
+                                                      <img
+                                                          src={p.photo_URL}
+                                                          alt={p.photo_alt}
+                                                          style={{ height: '100%', width: '100%' }}
+                                                      />
+                                                  </Box>
+                                              </Grid>
+                                          ))
+                                        : null}
+                                    <Grid size={2}>
+                                        <Box
+                                            sx={{
+                                                bgcolor: 'grey.300',
+                                                height: 60,
+                                                width: 100,
+                                                borderRadius: 2,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                color: 'grey.500',
+                                            }}
+                                        >
+                                            <iframe
+                                                src={registerService?.video_url}
+                                                title={registerService?.nome_servico}
+                                                style={{ height: '100%', width: '100%' }}
+                                            />
+                                        </Box>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
 
                             <Typography variant='h5' fontWeight='bold' color='textPrimary' mb={2}>
-                                Título do Serviço
+                                {registerService?.nome_servico ?? 'Título do Serviço'}
                             </Typography>
 
                             <Box mb={2}>
-                                <Chip label='Categoria' color='primary' size='small' />
                                 <Chip
-                                    label='Subcategoria'
+                                    label={registerService?.categoria ?? 'Categoria'}
+                                    color='primary'
+                                    size='small'
+                                />
+                                <Chip
+                                    label={registerService?.sub_categoria ?? 'Subcategoria'}
                                     variant='outlined'
                                     size='small'
                                     sx={{ ml: 1 }}
@@ -85,8 +159,8 @@ const PreviewSection = () => {
                                 Descrição
                             </Typography>
                             <Typography variant='body2' color='textSecondary'>
-                                Sua descrição aparecerá aqui. Descreva detalhadamente o serviço que
-                                você oferece...
+                                {registerService?.descricao ??
+                                    'Sua descrição aparecerá aqui. Descreva detalhadamente o serviço que você oferece...'}
                             </Typography>
                         </Grid>
 
@@ -102,7 +176,7 @@ const PreviewSection = () => {
                                 </Typography>
                                 <Box display='flex' alignItems='center' mb={2}>
                                     <Avatar
-                                        src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg'
+                                        src={usuario?.corp?.logo_url ?? undefined}
                                         sx={{ mr: 2 }}
                                     />
                                     <Box>
@@ -111,7 +185,7 @@ const PreviewSection = () => {
                                             fontWeight='bold'
                                             color='textPrimary'
                                         >
-                                            Carlos Oliveira
+                                            {usuario.corp?.nome_fantasia ?? ' Carlos Oliveira'}
                                         </Typography>
                                         <Box color='amber.400' display='flex' alignItems='center'>
                                             <FaStar /> <FaStar /> <FaStar /> <FaStar />{' '}

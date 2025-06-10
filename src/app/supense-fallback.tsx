@@ -1,12 +1,13 @@
 'use client';
 
-import { ReactNode, Suspense } from 'react';
-import { useAppSelector } from './store/hooks/hooks';
-import { CircularProgress, Modal } from '@mui/material';
+import { ReactNode, Suspense, useEffect } from 'react';
+import { useAppDispatch, useAppSelector } from './store/hooks/hooks';
+import { Alert, CircularProgress, Modal } from '@mui/material';
+import { setAlertApp } from './store/reducers/configApp/configApp.slice';
 
 const ModalLoading = ({ open }: { open: boolean }) => {
     return (
-        <Modal open={open}>
+        <Modal open={open} className='flex items-center justify-center'>
             <>
                 <svg width={0} height={0}>
                     <defs>
@@ -23,9 +24,26 @@ const ModalLoading = ({ open }: { open: boolean }) => {
 };
 
 export default function SuspenseFallback({ children }: { children: ReactNode }) {
-    const { loading } = useAppSelector((state) => state.commonApp);
+    const dispatch = useAppDispatch();
+    const { loading, alertApp } = useAppSelector((state) => state.commonApp);
+    useEffect(() => {
+        if (alertApp.show) {
+            setTimeout(() => {
+                dispatch(setAlertApp({ show: false, message: '', type: 'success' }));
+            }, 3000);
+        }
+    }, [alertApp]);
     return (
         <>
+            {alertApp && alertApp.show && (
+                <Alert
+                    variant='filled'
+                    sx={{ position: 'fixed', top: 0, zIndex: 9999 }}
+                    severity={alertApp.type}
+                >
+                    {alertApp.message}.
+                </Alert>
+            )}
             {loading && <ModalLoading open={loading} />}
             <Suspense fallback={<ModalLoading open={loading} />}>{children}</Suspense>
         </>

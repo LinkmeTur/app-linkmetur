@@ -31,6 +31,7 @@ import { formatCNPJ } from '@/app/config/functions/formatCNPJ';
 import { formatPhone } from '@/app/config/functions/formatPhone';
 import { cleanCaracters } from '@/app/config/functions/cleanCaracters';
 import { formatCep } from '@/app/config/functions/formatCep';
+import { setloading } from '@/app/store/reducers/configApp/configApp.slice';
 
 const tiposCorporacoes = [
     {
@@ -99,6 +100,7 @@ export default function Register() {
         }
     };
     const handleDataSend = () => {
+        dispatch(setloading(true));
         const userMaster: Partial<TUserPass> = {
             nome,
             email,
@@ -117,6 +119,7 @@ export default function Register() {
         };
 
         dispatch(createCorporation({ corp: companyMaster, user: userMaster })).then(() => {
+            dispatch(setloading(false));
             dispatch(clearCorporationState());
             dispatch(clearUserState());
             router.push('/signin');
@@ -189,7 +192,7 @@ export default function Register() {
                     ))}
                 </Box>
             ) : (
-                <Paper sx={{ maxWidth: 700, mx: 'auto', p: 4, mt: 4 }}>
+                <Paper sx={{ maxWidth: 700, mx: 'auto', p: 2, mt: 4 }}>
                     <LinearProgress variant='determinate' value={(step / totalSteps) * 100} />
                     <Typography align='center' sx={{ mt: 2 }}>
                         {Math.round((step / totalSteps) * 100)}% concluído
@@ -202,6 +205,15 @@ export default function Register() {
                                 fullWidth
                                 value={formatCNPJ(cnpj)}
                                 onChange={(e) => setCnpj(e.target.value)}
+                                onKeyUp={(e) => {
+                                    if (e.key === 'Enter') {
+                                        dispatch(consultCNPJ(cnpj.replace(/\D/g, '')))
+                                            .unwrap()
+                                            .then((r) => {
+                                                return r?.status === 200 ? nextStep() : setCnpj('');
+                                            });
+                                    }
+                                }}
                             />
                             <Button
                                 variant='contained'
@@ -210,7 +222,9 @@ export default function Register() {
                                 onClick={() =>
                                     dispatch(consultCNPJ(cnpj.replace(/\D/g, '')))
                                         .unwrap()
-                                        .then(nextStep)
+                                        .then((r) => {
+                                            return r?.status === 200 ? nextStep() : setCnpj('');
+                                        })
                                 }
                             >
                                 Buscar Dados
@@ -219,174 +233,173 @@ export default function Register() {
                     )}
 
                     {step === 1 && companyData && (
-                        <Box>
-                            <Box className='flex flex-col gap-2'>
+                        <>
+                            <Box sx={{ height: 340, overflow: 'auto' }}>
+                                <Box>
+                                    <TextField
+                                        fullWidth
+                                        label={'Empresa'}
+                                        name={'razao_social'}
+                                        value={companyData.razao_social}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled
+                                        size='small'
+                                    />
+                                </Box>
+                                <Box className='flex gap-2'>
+                                    <TextField
+                                        label={'CNPJ'}
+                                        name={'cnpj'}
+                                        value={
+                                            companyData.cnpj
+                                                ? formatCNPJ(companyData.cnpj)
+                                                : companyData.cnpj
+                                        }
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled
+                                        size='small'
+                                    />
+                                    <TextField
+                                        className='flex-1'
+                                        label={'Nome Fantasia'}
+                                        name={'nome_fantasia'}
+                                        value={companyData.nome_fantasia}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                </Box>
+                                <Box className='flex gap-2'>
+                                    <TextField
+                                        className='flex-1'
+                                        label={'Natureza Juridica'}
+                                        name={'natureza_juridica'}
+                                        value={companyData.natureza_juridica}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled
+                                        size='small'
+                                    />
+                                    <TextField
+                                        label={'Situação'}
+                                        name={'situacao_cadastral'}
+                                        value={companyData.situacao_cadastral}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled
+                                        size='small'
+                                    />
+                                </Box>
                                 <TextField
-                                    label={'Empresa'}
-                                    name={'razao_social'}
-                                    value={companyData.razao_social}
+                                    label={'Atividade'}
+                                    name={'cnae_fiscal_principal'}
+                                    value={companyData.cnae_fiscal_principal}
                                     onChange={handleChange}
                                     margin='dense'
                                     disabled
                                     size='small'
+                                    fullWidth
                                 />
-                            </Box>
-                            <Box className='flex gap-2'>
-                                <TextField
-                                    label={'CNPJ'}
-                                    name={'cnpj'}
-                                    value={
-                                        companyData.cnpj
-                                            ? formatCNPJ(companyData.cnpj)
-                                            : companyData.cnpj
-                                    }
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled
-                                    size='small'
-                                />
-                                <TextField
-                                    className='flex-1'
-                                    label={'Nome Fantasia'}
-                                    name={'nome_fantasia'}
-                                    value={companyData.nome_fantasia}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                            </Box>
-                            <Box className='flex gap-2'>
-                                <TextField
-                                    className='flex-1'
-                                    label={'Natureza Juridica'}
-                                    name={'natureza_juridica'}
-                                    value={companyData.natureza_juridica}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled
-                                    size='small'
-                                />
-                                <TextField
-                                    label={'Situação'}
-                                    name={'situacao_cadastral'}
-                                    value={companyData.situacao_cadastral}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled
-                                    size='small'
-                                />
-                            </Box>
-                            <TextField
-                                label={'Atividade'}
-                                name={'cnae_fiscal_principal'}
-                                value={companyData.cnae_fiscal_principal}
-                                onChange={handleChange}
-                                margin='dense'
-                                disabled
-                                size='small'
-                                fullWidth
-                            />
-                            <Divider sx={{ my: 2 }} />
-                            <Box className='flex gap-2'>
-                                <TextField
-                                    label={'Telefone'}
-                                    name={'telefone'}
-                                    value={
-                                        companyData.telefone
-                                            ? formatPhone(companyData.telefone)
-                                            : ''
-                                    }
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                                <TextField
-                                    className='flex-1'
-                                    label={'Email'}
-                                    name={'email'}
-                                    value={companyData.email}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                            </Box>
-                            <Divider />
-                            <Box className='flex flex-wrap gap-2 w-full'>
-                                <TextField
-                                    className='w-[9rem]'
-                                    label={'Cep'}
-                                    name={'cep'}
-                                    value={
-                                        companyData.cep
-                                            ? formatCep(companyData.cep)
-                                            : companyData.cep
-                                    }
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                                <TextField
-                                    className='w-[5rem]'
-                                    label={'Nº'}
-                                    name={'numero'}
-                                    value={companyData.numero}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                                <TextField
-                                    className='  w-[24.6rem]'
-                                    label={'Bairro'}
-                                    name={'bairro'}
-                                    value={companyData.bairro}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                                <TextField
-                                    className='  w-[22rem]'
-                                    label={'Cidade'}
-                                    name={'cidade'}
-                                    value={companyData.cidade}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                                <TextField
-                                    className='flex-1'
-                                    label={'UF'}
-                                    name={'estado'}
-                                    value={companyData.estado}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                                <TextField
-                                    label={'País'}
-                                    name={'pais'}
-                                    value={companyData.pais}
-                                    onChange={handleChange}
-                                    margin='dense'
-                                    disabled={!isEditing}
-                                    size='small'
-                                />
-                            </Box>
+                                <Divider sx={{ my: 1 }} />
+                                <Box className='flex gap-2'>
+                                    <TextField
+                                        label={'Telefone'}
+                                        name={'telefone'}
+                                        value={
+                                            companyData.telefone
+                                                ? formatPhone(companyData.telefone)
+                                                : ''
+                                        }
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                    <TextField
+                                        className='flex-1'
+                                        label={'Email'}
+                                        name={'email'}
+                                        value={companyData.email}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                </Box>
 
+                                <Box className='flex flex-wrap gap-2 w-full'>
+                                    <TextField
+                                        className='w-[9rem]'
+                                        label={'Cep'}
+                                        name={'cep'}
+                                        value={
+                                            companyData.cep
+                                                ? formatCep(companyData.cep)
+                                                : companyData.cep
+                                        }
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                    <TextField
+                                        className='w-[5rem]'
+                                        label={'Nº'}
+                                        name={'numero'}
+                                        value={companyData.numero}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                    <TextField
+                                        className='  w-[25.8rem]'
+                                        label={'Bairro'}
+                                        name={'bairro'}
+                                        value={companyData.bairro}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                    <TextField
+                                        className='  w-[22rem]'
+                                        label={'Cidade'}
+                                        name={'cidade'}
+                                        value={companyData.cidade}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                    <TextField
+                                        className='flex-1'
+                                        label={'UF'}
+                                        name={'estado'}
+                                        value={companyData.estado}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                    <TextField
+                                        label={'País'}
+                                        name={'pais'}
+                                        value={companyData.pais}
+                                        onChange={handleChange}
+                                        margin='dense'
+                                        disabled={!isEditing}
+                                        size='small'
+                                    />
+                                </Box>
+                            </Box>
                             <Button variant='contained' fullWidth onClick={handleEditClick}>
                                 {isEditing ? 'Salvar' : 'Editar'}
                             </Button>
-                            <Button variant='contained' fullWidth sx={{ mt: 2 }} onClick={nextStep}>
-                                Continuar
-                            </Button>
-                        </Box>
+                        </>
                     )}
 
                     {step === 2 && (
@@ -397,9 +410,6 @@ export default function Register() {
                                 value={nome}
                                 onChange={(e) => setNome(e.target.value)}
                             />
-                            <Button variant='contained' fullWidth sx={{ mt: 2 }} onClick={nextStep}>
-                                Continuar
-                            </Button>
                         </Box>
                     )}
                     {step === 3 && (
@@ -450,9 +460,6 @@ export default function Register() {
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
                             />
-                            <Button variant='contained' fullWidth sx={{ mt: 2 }} onClick={nextStep}>
-                                Continuar
-                            </Button>
                         </Box>
                     )}
 
@@ -477,9 +484,14 @@ export default function Register() {
                     )}
 
                     {step > 0 && (
-                        <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={prevStep}>
-                            Voltar
-                        </Button>
+                        <Box className='flex gap-2'>
+                            <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={prevStep}>
+                                Voltar
+                            </Button>
+                            <Button variant='contained' fullWidth sx={{ mt: 2 }} onClick={nextStep}>
+                                Continuar
+                            </Button>
+                        </Box>
                     )}
                 </Paper>
             )}

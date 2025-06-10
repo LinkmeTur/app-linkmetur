@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { TCorporation } from '../corporation/corporation.slice';
 
 export type TUser = {
     id: string | null;
@@ -9,6 +10,7 @@ export type TUser = {
     telefone: string | null;
     nivel: number | null;
     corpId: string | null;
+    corp?: TCorporation | null;
 };
 
 const initialState: TUser = {

@@ -1,5 +1,7 @@
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
+import { cleanStatejobs, setRegisterService } from '@/app/store/reducers/jobs/jobs.slice';
 import { Box, Divider, Grid, MenuItem, TextField, Typography } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
 const categories: Record<string, string[]> = {
     marketing: [
@@ -65,7 +67,46 @@ const categories: Record<string, string[]> = {
 };
 
 const BasicInfoSection: FC = () => {
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const dispatch = useAppDispatch();
+    const [name, setName] = useState<string>('');
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
+    const [description, setDescription] = useState<string>('');
+    const [category, setCategory] = useState<string>('');
+    const [subcategory, setSubcategory] = useState<string>('');
+    const { registerService } = useAppSelector((state) => state.jobs);
+
+    useEffect(() => {
+        if (registerService) {
+            setName(registerService.nome_servico ?? '');
+            setPriceRange([registerService.min_valor ?? 0, registerService.max_valor ?? 0]);
+            setDescription(registerService.descricao ?? '');
+            setCategory(registerService.categoria ?? '');
+            setSubcategory(registerService.sub_categoria ?? '');
+        } else {
+            setName('');
+            setPriceRange([0, 0]);
+            setDescription('');
+            setCategory('');
+            setSubcategory('');
+        }
+    }, []);
+
+    const handleBasicInfo = () => {
+        if (!name || !priceRange || !description || !category || !subcategory) {
+            return;
+        }
+        dispatch(cleanStatejobs());
+        dispatch(
+            setRegisterService({
+                nome_servico: name,
+                min_valor: priceRange[0],
+                max_valor: priceRange[1],
+                descricao: description,
+                categoria: category,
+                sub_categoria: subcategory,
+            }),
+        );
+    };
 
     return (
         <Box sx={{ p: 2, mb: 4 }}>
@@ -82,6 +123,8 @@ const BasicInfoSection: FC = () => {
                         fullWidth
                         required
                         placeholder='Ex: Consultoria em Marketing Digital'
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                     />
                 </Grid>
 
@@ -95,6 +138,10 @@ const BasicInfoSection: FC = () => {
                             fullWidth
                             required
                             placeholder='Valor mínimo'
+                            value={priceRange[0]}
+                            onChange={(e) =>
+                                setPriceRange([parseInt(e.target.value), priceRange[1]])
+                            }
                         />
                     </Grid>
                     <Grid size={6}>
@@ -105,6 +152,10 @@ const BasicInfoSection: FC = () => {
                             fullWidth
                             required
                             placeholder='Valor máximo'
+                            value={priceRange[1]}
+                            onChange={(e) =>
+                                setPriceRange([priceRange[0], parseInt(e.target.value)])
+                            }
                         />
                     </Grid>
                 </Grid>
@@ -117,8 +168,8 @@ const BasicInfoSection: FC = () => {
                         variant='outlined'
                         fullWidth
                         required
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
                     >
                         {Object.keys(categories).map((key) => (
                             <MenuItem key={key} value={key}>
@@ -136,9 +187,11 @@ const BasicInfoSection: FC = () => {
                         variant='outlined'
                         fullWidth
                         required
-                        disabled={!selectedCategory}
+                        disabled={!category}
+                        value={subcategory}
+                        onChange={(e) => setSubcategory(e.target.value)}
                     >
-                        {(categories[selectedCategory] ?? []).map((sub) => (
+                        {(categories[category] ?? []).map((sub) => (
                             <MenuItem key={sub} value={sub}>
                                 {sub}
                             </MenuItem>
@@ -156,6 +209,9 @@ const BasicInfoSection: FC = () => {
                         rows={4}
                         required
                         placeholder='Descreva detalhadamente o serviço que você oferece...'
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        onBlur={handleBasicInfo}
                     />
                     <Typography variant='body2' color='text.secondary' sx={{ mt: 1 }}>
                         Mínimo de 100 caracteres. Descreva o que está incluído, sua experiência e
