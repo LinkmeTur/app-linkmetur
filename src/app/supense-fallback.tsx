@@ -26,11 +26,9 @@ export default function SuspenseFallback({ children }: { children: ReactNode }) 
     const dispatch = useAppDispatch();
     const { loading, alertApp } = useAppSelector((state) => state.commonApp);
     useEffect(() => {
-        if (alertApp.show) {
-            setTimeout(() => {
-                dispatch(setAlertApp({ show: false, message: '', type: 'success' }));
-            }, 3000);
-        }
+        setTimeout(() => {
+            dispatch(setAlertApp({ show: false, message: '', type: 'success' }));
+        }, 3000);
     }, [alertApp]);
     return (
         <>
