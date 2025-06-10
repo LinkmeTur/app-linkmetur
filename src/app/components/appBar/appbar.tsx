@@ -8,15 +8,25 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { Avatar, AvatarGroup, MenuItem, Popover, Stack } from '@mui/material';
+import { useAppSelector } from '@/app/store/hooks/hooks';
 
 export default function LinkmeTurAppBar() {
+    const { usuario } = useAppSelector((state) => state.auth);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [anchorELNotification, setAnchorElNotification] = React.useState<null | HTMLElement>(
         null,
     );
     const [anchorELMessage, setAnchorElMessage] = React.useState<null | HTMLElement>(null);
-    const [imageUrl1, setImageUrl1] = React.useState(undefined);
-    const [imageUrl2, setImageUrl2] = React.useState(undefined);
+    const [imageUrl1, setImageUrl1] = React.useState<string | undefined>(undefined);
+    const [imageUrl2, setImageUrl2] = React.useState<string | undefined>(undefined);
+    React.useEffect(() => {
+        if (usuario?.avatar_url) {
+            setImageUrl1(usuario?.avatar_url);
+        }
+        if (usuario?.corp?.logo_url) {
+            setImageUrl2(usuario?.corp?.logo_url);
+        }
+    }, [usuario]);
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         switch (event.currentTarget.id) {
