@@ -8,9 +8,13 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { Avatar, AvatarGroup, MenuItem, Popover, Stack } from '@mui/material';
-import { useAppSelector } from '@/app/store/hooks/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
+import { useRouter } from 'next/navigation';
+import { clearAuthState } from '@/app/store/reducers/auth/auth.slice';
 
 export default function LinkmeTurAppBar() {
+    const dipatch = useAppDispatch();
+    const route = useRouter();
     const { usuario } = useAppSelector((state) => state.auth);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [anchorELNotification, setAnchorElNotification] = React.useState<null | HTMLElement>(
@@ -285,7 +289,15 @@ export default function LinkmeTurAppBar() {
                     <MenuItem onClick={handleMenuClose}>Conta</MenuItem>
                     <MenuItem onClick={handleMenuClose}>Trocar Senha</MenuItem>
                     <MenuItem onClick={handleMenuClose}>Configurações</MenuItem>
-                    <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+                    <MenuItem
+                        onClick={() => {
+                            dipatch(clearAuthState());
+                            handleMenuClose();
+                            route.push('/');
+                        }}
+                    >
+                        Logout
+                    </MenuItem>
                 </Box>
             </Popover>
         </Stack>

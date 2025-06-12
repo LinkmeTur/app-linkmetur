@@ -2,8 +2,13 @@
 
 import { useState } from 'react';
 import { Box, Button, TextField, Typography, Paper, Link } from '@mui/material';
+import { useAppDispatch } from '@/app/store/hooks/hooks';
+import sendEmailForRecoveryPass from '@/app/store/reducers/auth/thunks/sendEmailForRecoveryPass.thunk';
+import { useRouter } from 'next/navigation';
 
 export default function RecoverPassword() {
+    const dispatch = useAppDispatch();
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
 
@@ -16,6 +21,19 @@ export default function RecoverPassword() {
         }
 
         setError('');
+        dispatch(sendEmailForRecoveryPass(email))
+            .unwrap()
+            .then((res) => {
+                console.log(res);
+                if (res.status === 200) {
+                    setEmail('');
+                    router.push('/signin');
+                }
+            })
+            .catch((err) => {
+                setEmail('');
+                console.log(err);
+            });
         console.log('Recuperação de senha enviada para:', email);
     };
 

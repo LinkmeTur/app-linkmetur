@@ -19,6 +19,7 @@ export default function Signin() {
         if (usuario && secaoAtiva) {
             route.push('/dashboard');
         } else {
+            route.push('/signin');
             dispatch(clearState());
         }
     }, [secaoAtiva, usuario]);
