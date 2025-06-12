@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
-import { cleanStatejobs, setRegisterService } from '@/app/store/reducers/jobs/jobs.slice';
+import { setRegisterService } from '@/app/store/reducers/jobs/jobs.slice';
 import { Box, Divider, Grid, MenuItem, TextField, Typography } from '@mui/material';
 import { FC, useEffect, useState } from 'react';
 
@@ -95,7 +95,7 @@ const BasicInfoSection: FC = () => {
         if (!name || !priceRange || !description || !category || !subcategory) {
             return;
         }
-        dispatch(cleanStatejobs());
+
         dispatch(
             setRegisterService({
                 nome_servico: name,

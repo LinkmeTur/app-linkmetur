@@ -10,7 +10,7 @@ const createJob = createAsyncThunk(
             dispatch(setloading(true));
             const { id, job } = data;
             const body = {
-                corp_Id: id,
+                corpId: id,
                 ...job,
                 publicado: true,
             };

@@ -26,6 +26,7 @@ LicenseInfo.setLicenseKey(
 export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }) {
     const [thisTheme, setThisTheme] = useState<Theme>(themeDark);
     const [logo, setLogo] = useState<boolean>(false);
+    const [logoPath, setLogoPath] = useState<string>('/');
     const [showLayoutDashboard, setShowLayoutDashboard] = useState<boolean>(false);
 
     const [dashboardLayoutNavigation, setDashboardLayoutNavigation] = useState<
@@ -102,10 +103,11 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
         setShowLayoutDashboard(true);
         const page = dashboardLayoutNavigation[show];
         if (pathname === '/' + page.segment) {
+            setLogoPath('/');
             setTitleTab(page.title);
         } else if (page.children) {
             const child = page.children.find((c) => '/' + c.segment === pathname)?.title;
-
+            setLogoPath('../');
             setTitleTab(child ?? '');
         } else {
             setTitleTab('');
@@ -128,14 +130,14 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                             title: `${titleTab}`,
                                             logo: !logo ? (
                                                 <Image
-                                                    src={'logoblackp.svg'}
+                                                    src={logoPath + 'logoblackp.svg'}
                                                     alt='Logo'
                                                     width={150}
                                                     height={100}
                                                 />
                                             ) : (
                                                 <Image
-                                                    src={'logowhitep.svg'}
+                                                    src={logoPath + 'logowhitep.svg'}
                                                     alt='Logo'
                                                     width={150}
                                                     height={100}

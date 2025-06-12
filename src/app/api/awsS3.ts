@@ -8,10 +8,10 @@ import {
 } from '@aws-sdk/client-s3';
 
 const s3 = new S3Client({
-    region: process.env.AWS_REGION as string,
+    region: process.env.NEXT_PUBLIC_AWS_REGION as string,
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+        accessKeyId: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.NEXT_PUBLIC_AWS_SECRET_ACCESS_KEY as string,
     },
     requestChecksumCalculation: 'WHEN_REQUIRED',
 });
@@ -23,11 +23,15 @@ export async function sendFileS3(key: string, file: File) {
         Body: file,
         ACL: ObjectCannedACL.public_read,
     };
+    console.log(process.env.NEXT_PUBLIC_AWS_REGION);
+    console.log('teste', s3);
     console.log(params);
     console.log(file);
 
     const command = new PutObjectCommand(params);
+    console.log(command);
     const res = await s3.send(command);
+    console.log(res);
     if (!res) throw new Error('Erro ao enviar arquivo para o S3');
     return {
         file_URL: `https://${params.Bucket}.s3.sa-east-1.amazonaws.com/${params.Key}`,

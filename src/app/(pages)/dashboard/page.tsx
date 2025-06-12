@@ -1,5 +1,4 @@
 'use client';
-
 import { Box, Button, Typography } from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import CadMetrics from './components/carMetrics';

@@ -29,7 +29,7 @@ export default function SuspenseFallback({ children }: { children: ReactNode }) 
         setTimeout(() => {
             dispatch(setAlertApp({ show: false, message: '', type: 'success' }));
         }, 3000);
-    }, [alertApp]);
+    }, [alertApp.show]);
     return (
         <>
             {alertApp && alertApp.show && (

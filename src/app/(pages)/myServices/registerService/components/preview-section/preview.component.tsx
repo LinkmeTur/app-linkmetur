@@ -76,8 +76,8 @@ const PreviewSection = () => {
                                 }}
                             >
                                 <img
-                                    src={imageFull}
-                                    alt='p'
+                                    src={imageFull || '/window.svg'}
+                                    alt='full'
                                     style={{ height: '100%', width: '100%' }}
                                 />
                             </Grid>
@@ -101,8 +101,8 @@ const PreviewSection = () => {
                                                       onClick={() => setImageFull(p.photo_URL)}
                                                   >
                                                       <img
-                                                          src={p.photo_URL}
-                                                          alt={p.photo_alt}
+                                                          src={p.photo_URL || undefined}
+                                                          alt={p.photo_alt || 'no image'}
                                                           style={{ height: '100%', width: '100%' }}
                                                       />
                                                   </Box>

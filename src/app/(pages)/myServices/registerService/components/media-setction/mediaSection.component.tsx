@@ -19,7 +19,9 @@ import { sendFileS3, deleteFile } from '@/app/api/awsS3';
 const MediaSection: FC = () => {
     const dispatch = useAppDispatch();
     const { registerService } = useAppSelector((state) => state.jobs);
-    const [images, setImages] = useState<{ photo_URL: string; photo_alt: string }[]>([]);
+    const [images, setImages] = useState<{ photo_URL: string; photo_alt: string }[]>(
+        registerService?.photos || [],
+    );
 
     const [videoURL, setVideoURL] = useState<string>();
 
@@ -47,6 +49,17 @@ const MediaSection: FC = () => {
                         ],
                     }),
                 );
+            } else {
+                dispatch(
+                    setRegisterService({
+                        photos: [
+                            {
+                                photo_URL: newPhoto.file_URL,
+                                photo_alt: newPhoto.file_alt,
+                            },
+                        ],
+                    }),
+                );
             }
         }
     };
@@ -63,17 +76,30 @@ const MediaSection: FC = () => {
     };
 
     useEffect(() => {
-        if (registerService?.photos) {
-            setImages(registerService.photos);
-        } else {
-            setImages([]);
-        }
-        if (registerService?.video_url) {
-            setVideoURL(registerService.video_url);
-        } else {
-            setVideoURL('');
+        if (registerService) {
+            setImages(registerService.photos || []);
+            setVideoURL(registerService.video_url || '');
         }
     }, []);
+
+    useEffect(() => {
+        if (registerService?.photos && registerService?.video_url) {
+            setImages(registerService.photos);
+            setVideoURL(registerService.video_url);
+            return;
+        }
+        if (registerService?.photos) {
+            setImages(registerService.photos);
+            return;
+        }
+
+        if (registerService?.video_url) {
+            setVideoURL(registerService.video_url);
+            return;
+        }
+        setVideoURL('');
+        setImages([]);
+    }, [registerService]);
 
     return (
         <Box sx={{ p: 2, mb: 4 }}>
@@ -90,6 +116,7 @@ const MediaSection: FC = () => {
                 type='file'
                 accept='image/*'
                 multiple
+                value={''}
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
                 id='upload-photo'
@@ -113,8 +140,8 @@ const MediaSection: FC = () => {
                         <Card sx={{ position: 'relative', width: 180 }}>
                             <CardMedia sx={{ height: 120 }}>
                                 <img
-                                    src={image.photo_URL}
-                                    alt={image.photo_alt}
+                                    src={image.photo_URL || undefined}
+                                    alt={image.photo_alt || 'Imagem' + index}
                                     style={{ width: '100%', height: '100%' }}
                                 />
                             </CardMedia>
@@ -143,7 +170,7 @@ const MediaSection: FC = () => {
                 variant='outlined'
                 placeholder='URL do vídeo (YouTube, Vimeo)'
                 sx={{ mt: 2 }}
-                value={videoURL}
+                value={videoURL || ''}
                 onChange={(e) => setVideoURL(e.target.value)}
                 onBlur={() => dispatch(setRegisterService({ video_url: videoURL }))}
             />

@@ -6,6 +6,11 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 export default function Home() {
     const router = useRouter();
     const [showAnimation, setShowAnimation] = useState(true);
+    const [animationUrl, setAnimationUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        setAnimationUrl('/LinkMe Tur.lottie'); // Ajuste aqui o caminho real do seu arquivo
+    }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -25,7 +30,9 @@ export default function Home() {
                 transition={{ duration: 4 }}
                 className='flex items-center justify-center h-screen'
             >
-                {showAnimation && <DotLottieReact src='LinkMe Tur.lottie' autoplay speed={0.5} />}
+                {showAnimation && animationUrl && (
+                    <DotLottieReact src={animationUrl} autoplay speed={0.5} />
+                )}
             </motion.div>
         </AnimatePresence>
     );
