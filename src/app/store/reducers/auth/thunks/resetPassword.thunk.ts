@@ -10,17 +10,16 @@ const resetPassword = createAsyncThunk(
             dispatch(setloading(true));
             const { id, senha } = data;
             const response = await api.doPatch(`users/${id}`, { senha });
-            if (response.status >= 200 && response.status < 300) {
-                dispatch(setloading(false));
-                dispatch(
-                    setAlertApp({
-                        type: 'success',
-                        message: 'Senha alterada com sucesso!',
-                        open: true,
-                    }),
-                );
-                return response;
-            }
+
+            dispatch(setloading(false));
+            dispatch(
+                setAlertApp({
+                    type: 'success',
+                    message: 'Senha alterada com sucesso!',
+                    open: true,
+                }),
+            );
+            return response;
         } catch (error) {
             if (error instanceof AxiosError) {
                 dispatch(setloading(false));

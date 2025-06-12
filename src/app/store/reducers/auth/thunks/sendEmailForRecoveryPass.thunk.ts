@@ -16,17 +16,16 @@ const sendEmailForRecoveryPass = createAsyncThunk(
             );
             dispatch(setloading(true));
             const response = await api.doPost('authentications/recovery-pass', { email });
-            if (response.status === 200) {
-                dispatch(setloading(false));
-                dispatch(
-                    setAlertApp({
-                        type: 'success',
-                        message: 'Email enviado com sucesso!',
-                        open: true,
-                    }),
-                );
-                return response;
-            }
+
+            dispatch(setloading(false));
+            dispatch(
+                setAlertApp({
+                    type: 'success',
+                    message: 'Email enviado com sucesso!',
+                    open: true,
+                }),
+            );
+            return response;
         } catch (error) {
             if (error instanceof AxiosError) {
                 dispatch(setloading(false));
