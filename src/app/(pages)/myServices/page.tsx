@@ -1,40 +1,146 @@
+'use client';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import SearchService from './components/search-service/seachService.component';
 import CardService from './components/card-service/cardService.component';
-import { Pagination } from '@mui/material';
+import { FormControl, Pagination, Select, MenuItem, InputLabel } from '@mui/material';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
+import { useEffect, useState } from 'react';
+import { getJobs, getJobsForCorp } from '@/app/store/reducers/jobs/thunks/getJobs.thunk';
 
 export default function MyServices() {
+    const dispatch = useAppDispatch();
+    const { serviceList } = useAppSelector((state) => state.jobs);
+    const { usuario } = useAppSelector((state) => state.auth);
+    const [resultList, setResultList] = useState<typeof serviceList>({
+        jobs: [],
+        totalPages: 0,
+        totalRecords: 0,
+    });
+    const [filters, setFilters] = useState<{
+        nome_servico: string;
+        categoria: string;
+        localizacao: string;
+        min_valor: number;
+        max_valor: number;
+        min_rating: number;
+        orderBy: 'relevance' | 'rating' | 'price-asc' | 'price-desc';
+    }>({
+        nome_servico: '',
+        categoria: '',
+        localizacao: '',
+        min_rating: 0,
+        min_valor: 0,
+        max_valor: 0,
+        orderBy: 'relevance',
+    });
+    const [page, setPage] = useState<number>(1);
+    const [limit, setLimit] = useState<number>(10);
+
+    useEffect(() => {
+        if (usuario.corp) {
+            if (usuario.corp.tipo === 'T') {
+                dispatch(getJobs({ ...filters, page, limit }));
+                return;
+            }
+            dispatch(
+                getJobsForCorp({
+                    corpId: usuario.corp.id as string,
+                    ...filters,
+                    page,
+                    limit,
+                }),
+            );
+        }
+    }, [page, limit, filters.orderBy]);
+
+    useEffect(() => {
+        if (serviceList) {
+            setResultList(serviceList);
+        }
+    }, [serviceList]);
+    const handleSearch = () => {
+        if (usuario.corp) {
+            if (usuario.corp.tipo === 'T') {
+                dispatch(getJobs({ ...filters, page, limit }));
+                return;
+            }
+            dispatch(
+                getJobsForCorp({
+                    corpId: usuario.corp.id as string,
+                    ...filters,
+                    page,
+                    limit,
+                }),
+            );
+        }
+    };
     return (
         <PageContainer title='' breadcrumbs={[]} id='main-content'>
             {/* <!-- Search Content --> */}
 
-            <SearchService />
+            <SearchService filter={filters} onSet={setFilters} onPress={handleSearch} />
 
             {/* <!-- Search Results --> */}
             <div className='flex flex-col lg:flex-row gap-6'>
                 {/* <!-- Results List --> */}
                 <section id='search-results' className='lg:w-2/3'>
                     <div className='flex items-center justify-between mb-4'>
-                        <h2 className='text-lg font-semibold text-gray-800'>Resultados (15)</h2>
+                        <h2 className='text-lg font-semibold text-gray-500'>
+                            Resultados ({resultList.totalRecords})
+                        </h2>
+                        <div className='flex items-center gap-2'>
+                            <span className='text-sm text-gray-500'>Mostrar</span>
 
-                        <div className='flex items-center'>
-                            <span className='text-sm text-gray-600 mr-2'>Ordenar por:</span>
-                            <select className='text-sm border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500'>
-                                <option value='relevance'>Relevância</option>
-                                <option value='rating'>Avaliação</option>
-                                <option value='price-asc'>Preço: menor para maior</option>
-                                <option value='price-desc'>Preço: maior para menor</option>
-                            </select>
+                            <Select
+                                size='small'
+                                value={limit}
+                                onChange={(e) => setLimit(e.target.value as number)}
+                                className='text-sm border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500'
+                            >
+                                <MenuItem value={10}>10 </MenuItem>
+                                <MenuItem value={20}>20</MenuItem>
+                                <MenuItem value={30}>30</MenuItem>
+                            </Select>
                         </div>
+
+                        <FormControl className='flex items-center'>
+                            <InputLabel id={'orderList'} className='text-sm mr-2'>
+                                Ordenar por:
+                            </InputLabel>
+                            <Select
+                                size='small'
+                                label=' Ordenar por:'
+                                labelId='orderList'
+                                value={filters.orderBy}
+                                onChange={(e) =>
+                                    setFilters({ ...filters, orderBy: e.target.value })
+                                }
+                                className='text-sm border-gray-300 rounded-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500'
+                            >
+                                <MenuItem value='relevance'>Relevância</MenuItem>
+                                <MenuItem value='rating'>Avaliação</MenuItem>
+                                <MenuItem value='price-asc'>Preço: menor para maior</MenuItem>
+                                <MenuItem value='price-desc'>Preço: maior para menor</MenuItem>
+                            </Select>
+                        </FormControl>
                     </div>
 
                     <div className='space-y-4'>
                         {/* <!-- Result Card 1 --> */}
-                        <CardService />
+                        {resultList.jobs.map((service) => (
+                            <CardService key={service.id} service={service} />
+                        ))}
 
                         {/* <!-- Pagination --> */}
                         <div id='pagination' className='flex items-center justify-center mt-6'>
-                            <Pagination count={10} shape='rounded' />
+                            <Pagination
+                                count={resultList.totalPages}
+                                page={page}
+                                onChange={(e, value) => {
+                                    setPage(value);
+                                }}
+                                shape='rounded'
+                            />
                         </div>
                     </div>
                 </section>

@@ -15,7 +15,7 @@ const sendEmailForRecoveryPass = createAsyncThunk(
                 }),
             );
             dispatch(setloading(true));
-            const response = await api.doPost('authentications/recovery-pass', { email });
+            const response = await api.doPost('authentications/recovery-pass', { email:email });
 
             dispatch(setloading(false));
             dispatch(
