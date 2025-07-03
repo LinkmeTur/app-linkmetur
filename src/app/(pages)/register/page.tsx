@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, Fragment, useEffect, useState } from 'react';
 import {
     Box,
     Button,
@@ -233,7 +233,7 @@ export default function Register() {
                     )}
 
                     {step === 1 && companyData && (
-                        <>
+                        <Fragment>
                             <Box sx={{ height: 340, overflow: 'auto' }}>
                                 <Box>
                                     <TextField
@@ -399,7 +399,7 @@ export default function Register() {
                             <Button variant='contained' fullWidth onClick={handleEditClick}>
                                 {isEditing ? 'Salvar' : 'Editar'}
                             </Button>
-                        </>
+                        </Fragment>
                     )}
 
                     {step === 2 && (

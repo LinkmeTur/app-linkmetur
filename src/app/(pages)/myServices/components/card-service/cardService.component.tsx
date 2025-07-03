@@ -23,7 +23,7 @@ import {
 } from 'react-icons/fa';
 import Image from 'next/image';
 import { IService } from '@/app/store/reducers/jobs/jobs.slice';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
 export default function CardService({ service }: { service: IService }) {
     const [star, setStar] = useState<number>(0);
@@ -303,7 +303,7 @@ export default function CardService({ service }: { service: IService }) {
                                     </Button>
                                 </Paper>
                                 {certifications && certifications.length && (
-                                    <>
+                                    <Fragment>
                                         <Typography
                                             variant='body2'
                                             fontWeight='bold'
@@ -331,7 +331,7 @@ export default function CardService({ service }: { service: IService }) {
                                                 ),
                                             )}
                                         </Grid>
-                                    </>
+                                    </Fragment>
                                 )}
                             </Grid>
                             <Grid size={12}>

@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { TUser } from '../user/user.slice';
 
 type InitialCorporationState = {
     id: string | null;
@@ -24,6 +25,18 @@ type InitialCorporationState = {
     estado: string | null;
     pais: string | null;
     localizacao: string | null;
+    profile: {
+        id?: string | null;
+        corpID?: string;
+        Wallpaper_Url?: string;
+        site?: string;
+        descricao?: string;
+        sobre?: string;
+        horario?: string;
+        certificacoes?: string;
+        redesSociais?: string;
+    };
+    users: TUser[];
 };
 
 const initialState: InitialCorporationState = {
@@ -50,6 +63,17 @@ const initialState: InitialCorporationState = {
     estado: null,
     pais: null,
     localizacao: null,
+    profile: {
+        corpID: '',
+        Wallpaper_Url: '',
+        site: '',
+        descricao: '',
+        sobre: '',
+        horario: '',
+        certificacoes: '',
+        redesSociais: '',
+    },
+    users: [],
 };
 
 const corporationSlice = createSlice({

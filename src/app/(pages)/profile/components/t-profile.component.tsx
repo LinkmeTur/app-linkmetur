@@ -1,72 +1,82 @@
-import { Box, Paper, Stack, Typography } from '@mui/material';
-import { PageContainer } from '@toolpad/core/PageContainer';
+'use client';
 
-export function TProfile() {
+import { formatPhone } from '@/app/config/functions/formatPhone';
+import { TUser } from '@/app/store/reducers/user/user.slice';
+import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { PageContainer } from '@toolpad/core/PageContainer';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { FaHeart, FaUserEdit } from 'react-icons/fa';
+
+export function TProfile({ user }: { user: TUser }) {
+    const router = useRouter();
+
     return (
         <PageContainer title='' breadcrumbs={[]}>
             <Paper elevation={12} className='rounded-lg overflow-hidden'>
                 {/* <!-- Company Header --> */}
                 <Box id='company-header' className='relative'>
-                    <Stack className='h-48 bg-emerald-600 relative w-full'>
-                        <Box
-                            sx={{
-                                backgroundImage:
-                                    'url(https://storage.googleapis.com/uxpilot-auth.appspot.com/35cdc99b4e-81ebe374d136c68e8a8b.png)',
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                backgroundRepeat: 'no-repeat',
-                            }}
-                            className='w-full h-full opacity-20'
-                        />
-                        <Stack className='absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent'></Stack>
+                    <Stack className='h-36 bg-emerald-600 relative w-full'>
+                        {user.corp?.profile?.Wallpaper_Url && (
+                            <Box className='w-full h-full opacity-20'>
+                                <Image
+                                    src={user.corp?.profile.Wallpaper_Url}
+                                    alt='Wallpaper'
+                                    width={500}
+                                    height={500}
+                                    className='w-full h-full'
+                                />
+                            </Box>
+                        )}
+                        <Stack className='absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent' />
                     </Stack>
 
-                    <div className='absolute bottom-0 left-0 w-full px-8 pb-4'>
-                        <div className='flex items-end'>
-                            <Stack
-                                sx={{
-                                    backgroundImage: `url(https://storage.googleapis.com/uxpilot-auth.appspot.com/dff1550b98-a5524f5bbdb10863c6ff.png)`,
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
-                                    backgroundRepeat: 'no-repeat',
-                                }}
-                                className='relative mr-6 h-24 w-24 rounded-lg  p-1 shadow-md border-4 border-white'
-                            />
+                    <Stack className='absolute bottom-0 left-0 w-full px-8 pb-4'>
+                        <Box className='flex items-end'>
+                            <Stack className='relative mr-6 h-24 w-24 rounded-lg  p-1 shadow-md border-4 border-white'>
+                                {user.corp?.logo_url && (
+                                    <Image
+                                        src={user.corp?.logo_url}
+                                        alt='logo'
+                                        width={500}
+                                        height={500}
+                                        className='w-full h-full'
+                                    />
+                                )}
+                            </Stack>
 
                             <Stack className='flex-1 text-white pb-1'>
                                 <Typography className='text-2xl font-bold'>
-                                    Eco Aventuras
+                                    {user?.corp?.razao_social}
                                 </Typography>
-                                <div className='flex items-center mt-1'>
+                                <Box className='flex items-center mt-1'>
                                     <i className='fa-solid fa-location-dot mr-2 text-emerald-300'></i>
-                                    <span className='text-sm'>Gramado, RS</span>
-                                </div>
+                                    <span className='text-sm'>
+                                        {user?.corp?.cidade}, {user?.corp?.estado}
+                                    </span>
+                                </Box>
                             </Stack>
 
-                            <div>
-                                <button
+                            <Stack>
+                                <Button
+                                    startIcon={<FaUserEdit />}
+                                    onClick={() => router.push('/profile/edit')}
+                                    id='btn-edit'
+                                    className='bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-md shadow-sm font-medium text-sm flex items-center'
+                                >
+                                    Editar
+                                </Button>
+                                {/* <Button
+                                    startIcon={<FaHeart />}
                                     id='btn-favorite'
                                     className='bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-md shadow-sm font-medium text-sm flex items-center'
                                 >
-                                    <i className='fa-regular fa-heart mr-2'></i>
                                     Favoritar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                                </Button> */}
+                            </Stack>
+                        </Box>
+                    </Stack>
                 </Box>
-
-                {/* <!-- Company Info Tabs --> */}
-                <div id='company-tabs' className='px-8 pt-4 border-b border-gray-200'>
-                    <div className='flex space-x-8'>
-                        <button className='px-1 py-3 border-b-2 border-emerald-500 text-emerald-600 font-medium'>
-                            Informações
-                        </button>
-                        <button className='px-1 py-3 text-gray-500 hover:text-gray-700'>
-                            Histórico
-                        </button>
-                    </div>
-                </div>
 
                 {/* <!-- Company Basic Info --> */}
                 <div id='company-info' className='p-8'>
@@ -86,7 +96,8 @@ export function TProfile() {
                                         </div>
                                         <div className='flex-1'>
                                             <span className='text-sm text-gray-800'>
-                                                Eco Aventuras
+                                                {user?.corp?.nome_fantasia ||
+                                                    user?.corp?.razao_social}
                                             </span>
                                         </div>
                                     </div>
@@ -99,7 +110,9 @@ export function TProfile() {
                                         </div>
                                         <div className='flex-1'>
                                             <span className='text-sm text-gray-800'>
-                                                Rua das Hortênsias, 123 - Centro, Gramado, RS
+                                                {user?.corp?.endereco}, {user?.corp?.numero} -{' '}
+                                                {user?.corp?.bairro}, {user?.corp?.cidade} -{' '}
+                                                {user?.corp?.estado}
                                             </span>
                                         </div>
                                     </div>
@@ -112,7 +125,7 @@ export function TProfile() {
                                         </div>
                                         <div className='flex-1'>
                                             <span className='text-sm text-gray-800'>
-                                                Agência de Ecoturismo
+                                                {user?.corp?.cnae_fiscal_principal}
                                             </span>
                                         </div>
                                     </div>
@@ -125,7 +138,7 @@ export function TProfile() {
                                         </div>
                                         <div className='flex-1'>
                                             <span className='text-sm text-gray-800'>
-                                                (54) 3295-1234
+                                                {formatPhone(user?.corp?.telefone as string)}
                                             </span>
                                         </div>
                                     </div>
@@ -138,7 +151,7 @@ export function TProfile() {
                                         </div>
                                         <div className='flex-1'>
                                             <span className='text-sm text-gray-800'>
-                                                contato@ecoaventuras.com.br
+                                                {user?.corp?.email}
                                             </span>
                                         </div>
                                     </div>
@@ -151,7 +164,7 @@ export function TProfile() {
                                         </div>
                                         <div className='flex-1'>
                                             <span className='text-sm text-emerald-600 hover:underline cursor-pointer'>
-                                                www.ecoaventuras.com.br
+                                                {user?.corp?.profile?.site ?? ''}
                                             </span>
                                         </div>
                                     </div>
@@ -163,18 +176,10 @@ export function TProfile() {
                                     Sobre a Empresa
                                 </h3>
                                 <p className='text-sm text-gray-700 mb-4'>
-                                    A Eco Aventuras é uma agência especializada em ecoturismo
-                                    fundada em 2015, com foco em proporcionar experiências
-                                    sustentáveis e imersivas na natureza da Serra Gaúcha. Nossa
-                                    missão é conectar pessoas com a natureza de forma responsável e
-                                    educativa, promovendo a conservação ambiental e o
-                                    desenvolvimento das comunidades locais.
+                                    {user?.corp?.profile?.descricao}.
                                 </p>
                                 <p className='text-sm text-gray-700'>
-                                    Oferecemos roteiros exclusivos de trilhas, rapel, observação de
-                                    aves, turismo rural e experiências de imersão cultural com
-                                    comunidades tradicionais. Todos os nossos guias são certificados
-                                    e especialistas em educação ambiental.
+                                    {user?.corp?.profile?.sobre}
                                 </p>
                             </section>
 

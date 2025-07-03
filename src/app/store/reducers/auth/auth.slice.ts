@@ -38,7 +38,9 @@ const authSlice = createSlice({
             const payload = action.payload;
             // Atualiza somente os campos que foram modificados no payload
             Object.keys(payload).forEach((key) => {
-                state.usuario[key as keyof TUser] = payload[key];
+                if (key !== 'senha') {
+                    state.usuario[key as keyof TUser] = payload[key];
+                }
             });
         },
     },

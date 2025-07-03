@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { CssBaseline, Divider, IconButton, Theme, ThemeProvider, Typography } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { JSX, useEffect, useState } from 'react';
+import { Fragment, JSX, useEffect, useState } from 'react';
 import { NextAppProvider } from '@toolpad/core/nextjs';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { themeDark, themelight } from './themes/theme.light';
@@ -128,16 +128,13 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                         defaultSidebarCollapsed
                                         branding={{
                                             title: `${titleTab}`,
-                                            logo: !logo ? (
+                                            logo: (
                                                 <Image
-                                                    src={logoPath + 'logoblackp.svg'}
-                                                    alt='Logo'
-                                                    width={150}
-                                                    height={100}
-                                                />
-                                            ) : (
-                                                <Image
-                                                    src={logoPath + 'logowhitep.svg'}
+                                                    src={
+                                                        !logo
+                                                            ? logoPath + 'logoblackp.svg'
+                                                            : logoPath + 'logowhitep.svg'
+                                                    }
                                                     alt='Logo'
                                                     width={150}
                                                     height={100}
@@ -146,7 +143,7 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                         }}
                                         slots={{
                                             toolbarActions: () => (
-                                                <>
+                                                <Fragment>
                                                     <LinkmeTurAppBar />
                                                     <IconButton
                                                         onClick={() => {
@@ -164,10 +161,10 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                                     >
                                                         {logo ? <IoMoon /> : <IoSunny />}
                                                     </IconButton>
-                                                </>
+                                                </Fragment>
                                             ),
                                             sidebarFooter: ({ mini }) => (
-                                                <>
+                                                <Fragment>
                                                     <Divider />
                                                     <Typography
                                                         variant='caption'
@@ -181,7 +178,7 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                                             ? '© 2025'
                                                             : `© 2025 Desenvolvido por Linkme Tur.`}
                                                     </Typography>
-                                                </>
+                                                </Fragment>
                                             ),
                                         }}
                                     >

@@ -10,8 +10,9 @@ import { MdVerified } from 'react-icons/md';
 import { FaLeaf } from 'react-icons/fa';
 import { FaBriefcase, FaLanguage, FaLocationDot } from 'react-icons/fa6';
 import { useState } from 'react';
+import { TUser } from '@/app/store/reducers/user/user.slice';
 
-export function PProfile() {
+export function PProfile({ user }: { user: TUser }) {
     const [value, setValue] = useState('1');
 
     const handleChangeTab = (event: React.SyntheticEvent, newValue: string) => {
@@ -34,7 +35,7 @@ export function PProfile() {
                 <Box className='pt-20 pb-6 px-8 flex justify-between'>
                     <Stack>
                         <Box className='flex items-start gap-2 mb-4 md:mb-0'>
-                            <Typography>Nome do Usuário</Typography>
+                            <Typography>{user.corp?.razao_social}</Typography>
                             <Chip
                                 icon={<MdVerified />}
                                 label='Verificado'

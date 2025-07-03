@@ -45,7 +45,37 @@ export interface IService {
         localizacao: string;
     };
 }
-
+export interface IRfp {
+    corpID: string;
+    prestadorID?: string;
+    jobID?: string;
+    titulo: string;
+    descricao: string;
+    detalhes: string;
+    prazo: string;
+    valor_medio: string;
+    tipo: string;
+    status?: string;
+    fotos?: {
+        photo_URL: string;
+        photo_alt: string;
+    }[];
+    proposal: Array<IProposal>;
+}
+export interface IProposal {
+    reqId: string;
+    corpID: string;
+    prestadorID?: string;
+    resumo_proposta: string;
+    valor_proposta: string;
+    observações: string;
+    prazo: Date;
+    status: string;
+    fotos?: {
+        photo_URL: string;
+        photo_alt: string;
+    }[];
+}
 export type TJobState = {
     serviceList: {
         jobs: Array<IService & { id: string }>;
@@ -53,15 +83,27 @@ export type TJobState = {
         totalPages: number;
     };
     registerService: IService | null;
-    rfpList: Array<any>;
-    proposalList: Array<any>;
+    rfpList: {
+        rfps: Array<IRfp & { id: string }>;
+        totalRecords: number;
+        totalPages: number;
+    };
+    rfp: IRfp | null;
+    proposalList: {
+        proposals: Array<IProposal & { id: string }>;
+        totalRecords: number;
+        totalPages: number;
+    };
+    proposal: IProposal | null;
 };
 
 const initialState: TJobState = {
     serviceList: { jobs: [], totalRecords: 0, totalPages: 0 },
     registerService: null,
-    rfpList: [],
-    proposalList: [],
+    rfpList: { rfps: [], totalRecords: 0, totalPages: 0 },
+    rfp: null,
+    proposalList: { proposals: [], totalRecords: 0, totalPages: 0 },
+    proposal: null,
 };
 
 const jobsSlice = createSlice({

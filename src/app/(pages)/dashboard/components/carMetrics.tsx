@@ -1,6 +1,6 @@
 'use client';
 import { Card } from '@mui/material';
-import { JSX } from 'react';
+import { Fragment, JSX } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
 
 export default function CadMetrics({
@@ -31,12 +31,12 @@ export default function CadMetrics({
             </div>
             <div className='mt-2 flex items-center text-xs'>
                 {!isNaN(Number(percent)) ? (
-                    <>
+                    <Fragment>
                         <span className='text-green-500 font-medium flex items-center'>
                             <FaArrowUp /> {percent}%
                         </span>
                         <span className='text-gray-500 ml-1'>desde o último mês</span>
-                    </>
+                    </Fragment>
                 ) : (
                     <span className='text-gray-500 ml-1'>{percent}</span>
                 )}

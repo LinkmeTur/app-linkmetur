@@ -1,5 +1,5 @@
 'use client';
-import { ReactNode, Suspense, useEffect } from 'react';
+import { Fragment, ReactNode, Suspense, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store/hooks/hooks';
 import { Alert, CircularProgress, Modal } from '@mui/material';
 import { setAlertApp } from './store/reducers/configApp/configApp.slice';
@@ -7,7 +7,7 @@ import { setAlertApp } from './store/reducers/configApp/configApp.slice';
 const ModalLoading = ({ open }: { open: boolean }) => {
     return (
         <Modal open={open} className='flex items-center justify-center'>
-            <>
+            <Fragment>
                 <svg width={0} height={0}>
                     <defs>
                         <linearGradient id='my_gradient' x1='0%' y1='0%' x2='0%' y2='100%'>
@@ -17,7 +17,7 @@ const ModalLoading = ({ open }: { open: boolean }) => {
                     </defs>
                 </svg>
                 <CircularProgress sx={{ 'svg circle': { stroke: 'url(#my_gradient)' } }} />
-            </>
+            </Fragment>
         </Modal>
     );
 };
@@ -31,7 +31,7 @@ export default function SuspenseFallback({ children }: { children: ReactNode }) 
         }, 3000);
     }, [alertApp.show]);
     return (
-        <>
+        <Fragment>
             {alertApp && alertApp.show && (
                 <Alert
                     variant='filled'
@@ -43,6 +43,6 @@ export default function SuspenseFallback({ children }: { children: ReactNode }) 
             )}
             {loading && <ModalLoading open={loading} />}
             <Suspense fallback={<ModalLoading open={loading} />}>{children}</Suspense>
-        </>
+        </Fragment>
     );
 }
