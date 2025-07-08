@@ -1,8 +1,46 @@
 /* eslint-disable @next/next/no-img-element */
-import { Box, Paper } from '@mui/material';
+'use client';
+import socket from '@/app/api/socket';
+import {
+    Box,
+    IconButton,
+    List,
+    ListItem,
+    Paper,
+    Stack,
+    TextField,
+    Typography,
+} from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
+import { useEffect, useState } from 'react';
+import { FaFile, FaImage, FaLock, FaSearch } from 'react-icons/fa';
+import { FaFaceSmile } from 'react-icons/fa6';
 
 export default function Messages() {
+    const [contacts, setContacts] = useState([]);
+    const [selectedContact, setSelectedContact] = useState(null);
+    const [messages, setMessages] = useState<{ [key: string]: string[] }>({});
+    const [input, setInput] = useState('');
+    useEffect(() => {
+        socket.on('receive_message', ({ from, message }) => {
+            setMessages((prev) => ({
+                ...prev,
+                [from]: [...(prev[from] || []), message],
+            }));
+        });
+        return () => socket.off('receive_message');
+    }, []);
+
+    const sendMessage = () => {
+        if (!selectedContact) return;
+        socket.emit('send_message', { to: selectedContact, message: input });
+        setMessages((prev) => ({
+            ...prev,
+            [selectedContact]: [...(prev[selectedContact] || []), `Você: ${input}`],
+        }));
+        setInput('');
+    };
+
     return (
         <PageContainer title='' breadcrumbs={[]} className='px-0  overflow-hidden'>
             {/* <!-- Messaging Content --> */}
@@ -11,172 +49,50 @@ export default function Messages() {
                 {/* <!-- Conversation List --> */}
                 <Box id='conversation-list' className='w-1/3  border-r border-gray-200 '>
                     {/* <!-- Search Bar --> */}
-                    <div className='p-3 border-b border-gray-200'>
-                        <div className='relative'>
-                            <input
-                                type='text'
-                                placeholder='Buscar conversas...'
-                                className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent'
-                            />
-                            <i className='fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
-                        </div>
-                    </div>
 
-                    {/* <!-- Conversation Filters --> */}
-                    <div className='flex border-b border-gray-200 text-sm'>
-                        <button className='flex-1 py-3 text-center font-medium text-emerald-600 border-b-2 border-emerald-500'>
-                            Todas
-                        </button>
-                        <button className='flex-1 py-3 text-center font-medium text-gray-500 hover:text-gray-700'>
-                            Não lidas
-                        </button>
-                        <button className='flex-1 py-3 text-center font-medium text-gray-500 hover:text-gray-700'>
-                            Arquivadas
-                        </button>
-                    </div>
+                    <Stack className='p-3'>
+                        <TextField
+                            slotProps={{
+                                input: {
+                                    endAdornment: (
+                                        <IconButton>
+                                            <FaSearch />
+                                        </IconButton>
+                                    ),
+                                },
+                            }}
+                            type='text'
+                            placeholder='Buscar conversas...'
+                            className='text-sm '
+                            size='small'
+                            fullWidth
+                        />
+                    </Stack>
 
                     {/* <!-- Conversation Items --> */}
-                    <div className='overflow-y-auto h-[calc(100%-109px)]'>
-                        <div
-                            id='conversation-1'
-                            className='p-3 border-b border-gray-200 bg-emerald-50 cursor-pointer'
-                        >
-                            <div className='flex items-start'>
-                                <img
-                                    src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg'
-                                    alt='Avatar'
-                                    className='w-10 h-10 rounded-full mr-3'
-                                />
-                                <div className='flex-1 min-w-0'>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-sm font-semibold text-gray-900 truncate'>
-                                            Pousada Recanto Verde
-                                        </p>
-                                        <p className='text-xs text-gray-500'>09:45</p>
+                    <List className='overflow-y-auto h-[calc(100%-109px)]'>
+                        {contacts.map((contact) => (
+                            <ListItem
+                                key={contact}
+                                onClick={() => setSelectedContact(contact)}
+                                className={`p-3 cursor-pointer hover:bg-gray-100 ${
+                                    selectedContact === contact ? 'bg-gray-200' : ''
+                                }`}
+                            >
+                                <div className='flex items-center'>
+                                    <img
+                                        src='XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+                                        alt='Avatar'
+                                        className='w-10 h-10 rounded-full mr-3'
+                                    />
+                                    <div>
+                                        <p className='font-medium text-gray-900'>{contact}</p>
+                                        <p className='text-xs text-gray-500'>Online agora</p>
                                     </div>
-                                    <p className='text-xs font-medium text-emerald-600 mb-1'>
-                                        Proposta - Fotografia Profissional
-                                    </p>
-                                    <p className='text-xs text-gray-600 truncate'>
-                                        Olá Carlos! Gostaria de saber mais detalhes sobre o seu
-                                        serviço de fotografia para nossa pousada...
-                                    </p>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div
-                            id='conversation-2'
-                            className='p-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer'
-                        >
-                            <div className='flex items-start'>
-                                <img
-                                    src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg'
-                                    alt='Avatar'
-                                    className='w-10 h-10 rounded-full mr-3'
-                                />
-                                <div className='flex-1 min-w-0'>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-sm font-semibold text-gray-900 truncate'>
-                                            Hotel Montanha Azul
-                                        </p>
-                                        <p className='text-xs text-gray-500'>Ontem</p>
-                                    </div>
-                                    <p className='text-xs font-medium text-gray-600 mb-1'>
-                                        Consultoria em Gestão Turística
-                                    </p>
-                                    <p className='text-xs text-gray-600 truncate'>
-                                        Prezado Carlos, agradecemos pelo excelente trabalho
-                                        realizado. Gostaríamos de agendar uma reunião...
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            id='conversation-3'
-                            className='p-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer'
-                        >
-                            <div className='flex items-start'>
-                                <img
-                                    src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-7.jpg'
-                                    alt='Avatar'
-                                    className='w-10 h-10 rounded-full mr-3'
-                                />
-                                <div className='flex-1 min-w-0'>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-sm font-semibold text-gray-900 truncate'>
-                                            Agência Aventuras
-                                        </p>
-                                        <p className='text-xs text-gray-500'>2 dias</p>
-                                    </div>
-                                    <p className='text-xs font-medium text-gray-600 mb-1'>
-                                        Desenvolvimento de Website
-                                    </p>
-                                    <p className='text-xs text-gray-600 truncate'>
-                                        Boa tarde! Estamos interessados no seu serviço de
-                                        desenvolvimento web. Qual seria o prazo...
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            id='conversation-4'
-                            className='p-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer'
-                        >
-                            <div className='flex items-start'>
-                                <img
-                                    src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-8.jpg'
-                                    alt='Avatar'
-                                    className='w-10 h-10 rounded-full mr-3'
-                                />
-                                <div className='flex-1 min-w-0'>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-sm font-semibold text-gray-900 truncate'>
-                                            Restaurante Sabor da Serra
-                                        </p>
-                                        <p className='text-xs text-gray-500'>3 dias</p>
-                                    </div>
-                                    <p className='text-xs font-medium text-gray-600 mb-1'>
-                                        Marketing Digital
-                                    </p>
-                                    <p className='text-xs text-gray-600 truncate'>
-                                        Carlos, estamos muito satisfeitos com a campanha que você
-                                        desenvolveu. Conseguimos um aumento...
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div
-                            id='conversation-5'
-                            className='p-3 border-b border-gray-200 hover:bg-gray-50 cursor-pointer'
-                        >
-                            <div className='flex items-start'>
-                                <img
-                                    src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg'
-                                    alt='Avatar'
-                                    className='w-10 h-10 rounded-full mr-3'
-                                />
-                                <div className='flex-1 min-w-0'>
-                                    <div className='flex items-center justify-between'>
-                                        <p className='text-sm font-semibold text-gray-900 truncate'>
-                                            Parque Ecológico Vale Verde
-                                        </p>
-                                        <p className='text-xs text-gray-500'>1 semana</p>
-                                    </div>
-                                    <p className='text-xs font-medium text-gray-600 mb-1'>
-                                        Consultoria em Sustentabilidade
-                                    </p>
-                                    <p className='text-xs text-gray-600 truncate'>
-                                        Prezado Carlos, seguindo nosso último encontro, gostaria de
-                                        confirmar a implementação das...
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                            </ListItem>
+                        ))}
+                    </List>
                 </Box>
 
                 {/* <!-- Chat Window --> */}
@@ -219,11 +135,6 @@ export default function Messages() {
 
                             {/* <!-- Received Message --> */}
                             <div className='flex items-end'>
-                                <img
-                                    src='https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-1.jpg'
-                                    alt='Avatar'
-                                    className='w-8 h-8 rounded-full mr-2'
-                                />
                                 <div className='max-w-[70%]'>
                                     <div className='bg-gray-100 p-3 rounded-t-lg rounded-r-lg'>
                                         <p className='text-sm text-gray-800'>
@@ -350,18 +261,24 @@ export default function Messages() {
                         <div className='flex items-center justify-between mt-2 px-2'>
                             <div className='flex items-center space-x-3 text-gray-500'>
                                 <button className='hover:text-gray-700'>
-                                    <i className='fa-solid fa-image'></i>
+                                    <FaImage />
                                 </button>
                                 <button className='hover:text-gray-700'>
-                                    <i className='fa-solid fa-file'></i>
+                                    <FaFile />
                                 </button>
                                 <button className='hover:text-gray-700'>
-                                    <i className='fa-solid fa-face-smile'></i>
+                                    <FaFaceSmile />
                                 </button>
                             </div>
-                            <div className='text-xs text-gray-500'>
-                                <i className='fa-solid fa-lock mr-1'></i> Mensagens criptografadas
-                            </div>
+                            <Stack
+                                direction={'row'}
+                                gap={1}
+                                alignItems={'center'}
+                                className='text-xs text-gray-500'
+                            >
+                                <FaLock />
+                                <Typography variant='body2'>Mensagens criptografadas</Typography>
+                            </Stack>
                         </div>
                     </div>
                 </Box>

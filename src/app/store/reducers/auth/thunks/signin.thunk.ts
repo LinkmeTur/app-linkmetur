@@ -12,6 +12,15 @@ const signin = createAsyncThunk(
             if (!response.usuario && !response.token) {
                 throw new Error('Erro ao fazer login');
             }
+
+            const responseCorp = await api.doGet(`/corporations/${response.usuario.corpId}`);
+            if (!responseCorp) {
+                throw new Error('Erro ao fazer login');
+            }
+            const auth = {
+                usuario: { ...response.usuario, corp: responseCorp },
+                token: response.token,
+            };
             localStorage.setItem('tipo', response.usuario.corp.tipo);
             dispatch(setloading(false));
             dispatch(
@@ -21,7 +30,7 @@ const signin = createAsyncThunk(
                     show: true,
                 }),
             );
-            return response;
+            return auth;
         } catch (error) {
             dispatch(setloading(false));
             dispatch(

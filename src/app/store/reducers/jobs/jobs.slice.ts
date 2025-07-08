@@ -46,6 +46,7 @@ export interface IService {
     };
 }
 export interface IRfp {
+    id?: string;
     corpID: string;
     prestadorID?: string;
     jobID?: string;
@@ -57,15 +58,18 @@ export interface IRfp {
     tipo: string;
     status?: string;
     fotos?: {
+        id?: string;
         photo_URL: string;
         photo_alt: string;
     }[];
     proposal: Array<IProposal>;
 }
 export interface IProposal {
+    id?: string;
     reqId: string;
     corpID: string;
     prestadorID?: string;
+    nome_empresa: string;
     resumo_proposta: string;
     valor_proposta: string;
     observações: string;
@@ -75,6 +79,23 @@ export interface IProposal {
         photo_URL: string;
         photo_alt: string;
     }[];
+}
+export interface IRequest {
+    id?: string;
+    jobID: string;
+    nome_job: string;
+    corpID: string;
+    nome_corp: string;
+    prestadorID: string;
+    nome_prestador: string;
+    rfpID: string;
+    rfp: IRfp;
+    proposalID: string;
+    proposal: IProposal;
+    prazo: Date;
+    status: string;
+    confirmOk: boolean;
+    payOk: boolean;
 }
 export type TJobState = {
     serviceList: {
@@ -90,11 +111,17 @@ export type TJobState = {
     };
     rfp: IRfp | null;
     proposalList: {
-        proposals: Array<IProposal & { id: string }>;
+        proposals: Array<IProposal>;
         totalRecords: number;
         totalPages: number;
     };
     proposal: IProposal | null;
+    requestList: {
+        requests: Array<IRequest>;
+        totalRecords: number;
+        totalPages: number;
+    };
+    request: IRequest | null;
 };
 
 const initialState: TJobState = {
@@ -104,6 +131,8 @@ const initialState: TJobState = {
     rfp: null,
     proposalList: { proposals: [], totalRecords: 0, totalPages: 0 },
     proposal: null,
+    requestList: { requests: [], totalRecords: 0, totalPages: 0 },
+    request: null,
 };
 
 const jobsSlice = createSlice({

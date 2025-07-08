@@ -1,7 +1,7 @@
 import { MdHomeWork, MdDesignServices, MdMessage, MdSupportAgent } from 'react-icons/md';
 import { RiAuctionFill, RiAccountBoxLine, RiSearchEyeLine } from 'react-icons/ri';
 import { GiRocketThruster, GiReceiveMoney, GiArchiveRegister } from 'react-icons/gi';
-import { VscSettingsGear } from 'react-icons/vsc';
+// import { VscSettingsGear } from 'react-icons/vsc';
 
 const LinkMeTurNavigationT = [
     {
@@ -32,14 +32,10 @@ const LinkMeTurNavigationT = [
         children: [
             {
                 segment: 'rfp',
-                title: 'Minhas Solicitaçoes',
+                title: 'Minhas Solicitaçoes e Porpostas',
                 icon: <RiSearchEyeLine />,
             },
-            {
-                segment: 'rfp/proposal',
-                title: 'Propostas Recebidas',
-                icon: <GiRocketThruster />,
-            },
+
             {
                 segment: 'rfp/requests',
                 title: 'Pedidos Feitos',
@@ -54,11 +50,11 @@ const LinkMeTurNavigationT = [
         icon: <MdMessage />,
     },
 
-    {
-        segment: 'settings',
-        title: 'Configurações',
-        icon: <VscSettingsGear />,
-    },
+    // {
+    //     segment: 'settings',
+    //     title: 'Configurações',
+    //     icon: <VscSettingsGear />,
+    // },
     {
         segment: 'support',
         title: 'Suporte',
@@ -81,13 +77,8 @@ const LinkMeTurNavigationP = [
         icon: <GiReceiveMoney />,
         children: [
             {
-                segment: 'rfp',
-                title: 'Buscar Solicitaçoes',
-                icon: <RiSearchEyeLine />,
-            },
-            {
                 segment: 'rfp/proposal',
-                title: 'Minhas Propostas',
+                title: 'Minhas Propostas e Solicitações',
                 icon: <GiRocketThruster />,
             },
             {
@@ -119,11 +110,11 @@ const LinkMeTurNavigationP = [
         icon: <MdMessage />,
     },
 
-    {
-        segment: 'settings',
-        title: 'Configurações',
-        icon: <VscSettingsGear />,
-    },
+    // {
+    //     segment: 'settings',
+    //     title: 'Configurações',
+    //     icon: <VscSettingsGear />,
+    // },
     {
         segment: 'support',
         title: 'Suporte',
