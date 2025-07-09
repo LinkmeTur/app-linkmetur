@@ -36,7 +36,7 @@ type TFotos = {
 export default function ModalRfp({
     open,
     setState,
-    rfp,
+    data,
 }: {
     open: boolean;
     setState: Dispatch<
@@ -45,15 +45,17 @@ export default function ModalRfp({
             rfp: IRfp | null;
         }>
     >;
-    rfp: IRfp | null;
+    data: { rfp: IRfp | null; page: number; limit: number };
 }) {
+    const { rfp, page, limit } = data;
+    const dataBR = rfp?.prazo ? new Date(rfp.prazo).toLocaleDateString('pt-BR') : '';
     const dispatch = useAppDispatch();
     const { usuario } = useAppSelector((state) => state.auth);
     const [titulo, setTitulo] = useState<string>('');
     const [descricao, setDescricao] = useState<string>('');
     const [detalhes, setDetalhes] = useState<string>('');
     const [valor, setValor] = useState<string>('');
-    const [prazo, setPrazo] = useState<string>('');
+    const [prazo, setPrazo] = useState<string>(dataBR);
     const [status, setStatus] = useState<string>('aberto');
     const [tipo, setTipo] = useState<string>('');
     const [fotos, setFotos] = useState<TFotos>([]);
@@ -63,10 +65,15 @@ export default function ModalRfp({
             setDescricao(rfp.descricao);
             setDetalhes(rfp.detalhes);
             setValor(rfp.valor_medio);
-            setPrazo(rfp.prazo);
+
             setStatus(rfp.status as string);
             setTipo(rfp.tipo);
-            setFotos(rfp.fotos as TFotos);
+            setFotos((rfp.fotos as TFotos) ?? []);
+            if (rfp.prazo) {
+                const data = new Date(rfp.prazo);
+
+                setPrazo(data.toLocaleDateString('pt-BR')); // Ex: "2026-01-01"
+            }
         }
     }, [rfp]);
 
@@ -81,6 +88,7 @@ export default function ModalRfp({
         setFotos([]);
         setState({ open: false, rfp: null });
     };
+
     const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
         if (fotos.length > 5) return;
 
@@ -97,20 +105,25 @@ export default function ModalRfp({
     };
 
     const handleCreateorSaved = () => {
+        const prazoLocal = new Date(prazo);
+
         if (rfp) {
             //update
             const upRfp: Partial<IRfp> = {
                 id: rfp.id as string,
+                corpID: usuario.corpId as string,
                 titulo,
                 descricao,
                 detalhes,
                 valor_medio: valor,
-                prazo,
+                prazo: prazoLocal,
                 status,
                 tipo,
                 fotos,
             };
-            dispatch(updateRfp(upRfp));
+            dispatch(updateRfp({ rfp: upRfp, page, limit }))
+                .unwrap()
+                .then(handleClose);
         } else {
             //create
             const newRfp: Partial<IRfp> = {
@@ -119,12 +132,12 @@ export default function ModalRfp({
                 descricao,
                 detalhes,
                 valor_medio: valor,
-                prazo,
+                prazo: prazoLocal,
                 status,
                 tipo,
                 fotos,
             };
-            dispatch(createRfp(newRfp));
+            dispatch(createRfp(newRfp)).unwrap().then(handleClose);
         }
     };
 
@@ -193,6 +206,7 @@ export default function ModalRfp({
                             sx={{ width: '7.9rem' }}
                         />
                         <TextField
+                            type={prazo === dataBR ? 'text' : 'datetime-local'}
                             value={prazo}
                             onChange={(e) => setPrazo(e.target.value)}
                             label='Prazo'
@@ -238,7 +252,7 @@ export default function ModalRfp({
                             id='upload-photo'
                         />
                         <label htmlFor='upload-photo'>
-                            {fotos.length < 5 && (
+                            {fotos && fotos.length < 5 && (
                                 <Button
                                     variant='outlined'
                                     component='span'
@@ -251,35 +265,36 @@ export default function ModalRfp({
                         </label>
 
                         <Grid container spacing={1} sx={{ mt: 2 }}>
-                            {fotos.map((image, index) => (
-                                <Grid size={2.4} key={index}>
-                                    <Card sx={{ position: 'relative', width: 120 }}>
-                                        <CardMedia sx={{ height: 80 }}>
-                                            <Image
-                                                src={image.photo_URL}
-                                                alt={image.photo_alt || 'Imagem' + index}
-                                                width={120}
-                                                height={80}
-                                                style={{ width: '100%', height: '100%' }}
-                                            />
-                                        </CardMedia>
-                                        <IconButton
-                                            onClick={() => removeImage(index)}
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 4,
-                                                right: 4,
-                                                bgcolor: 'rgba(0, 0, 0, 0.5)',
-                                                color: 'white',
-                                                width: 2,
-                                                height: 2,
-                                            }}
-                                        >
-                                            <Delete sx={{ fontSize: 15 }} />
-                                        </IconButton>
-                                    </Card>
-                                </Grid>
-                            ))}
+                            {fotos &&
+                                fotos.map((image, index) => (
+                                    <Grid size={2.4} key={index}>
+                                        <Card sx={{ position: 'relative', width: 120 }}>
+                                            <CardMedia sx={{ height: 80 }}>
+                                                <Image
+                                                    src={image.photo_URL}
+                                                    alt={image.photo_alt || 'Imagem' + index}
+                                                    width={120}
+                                                    height={80}
+                                                    style={{ width: '100%', height: '100%' }}
+                                                />
+                                            </CardMedia>
+                                            <IconButton
+                                                onClick={() => removeImage(index)}
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 4,
+                                                    right: 4,
+                                                    bgcolor: 'rgba(0, 0, 0, 0.5)',
+                                                    color: 'white',
+                                                    width: 2,
+                                                    height: 2,
+                                                }}
+                                            >
+                                                <Delete sx={{ fontSize: 15 }} />
+                                            </IconButton>
+                                        </Card>
+                                    </Grid>
+                                ))}
                         </Grid>
                     </Stack>
                 </Box>

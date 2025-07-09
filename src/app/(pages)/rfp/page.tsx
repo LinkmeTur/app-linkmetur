@@ -32,10 +32,12 @@ import { FC, Fragment, useEffect, useState } from 'react';
 import ModalRfp from './components/modalRfp.component';
 import { IProposal, IRfp } from '@/app/store/reducers/jobs/jobs.slice';
 import ModalProposal from './components/modalProposal.component';
+import { getRfpForCorp } from '@/app/store/reducers/jobs/thunks/rfp/getRfpforCorp.thunk';
 
 const RFPClient: FC = () => {
     const dispatch = useAppDispatch();
     const { rfpList } = useAppSelector((state) => state.jobs);
+    const { usuario } = useAppSelector((state) => state.auth);
     const [page, setPage] = useState<number>(1);
     const [limit, setLimit] = useState<number>(10);
 
@@ -51,7 +53,7 @@ const RFPClient: FC = () => {
     const [modalRfpSelect, setModalRfpSelect] = useState<{
         open: boolean;
         rfp: IRfp | null;
-    }>({ open: true, rfp: null });
+    }>({ open: false, rfp: null });
     const [proposalview, setProposalview] = useState<{ show: boolean; id: string | null }>({
         show: false,
         id: null,
@@ -66,10 +68,10 @@ const RFPClient: FC = () => {
             .then((res) => {
                 setPrestador(res);
             });
+        dispatch(getRfpForCorp({ corpID: usuario.corpId as string, page, limit }));
     }, []);
     useEffect(() => {
         if (rfpList && Array.isArray(rfpList.rfps)) {
-            alert(rfpList.rfps.length);
             setResultList(rfpList);
         }
     }, [rfpList]);
@@ -162,7 +164,7 @@ const RFPClient: FC = () => {
                     </Button>
                 </Box>
             </Paper>
-            {resultList.rfps.length ? (
+            {Array.isArray(resultList.rfps) && resultList.rfps.length ? (
                 <Box>
                     <Box className='flex items-center justify-between mb-4'>
                         <h2 className='text-lg font-semibold text-gray-500'>
@@ -199,7 +201,23 @@ const RFPClient: FC = () => {
                                             {rfp.detalhes}
                                         </Typography>
                                         <Typography variant='body2' color='text.secondary'>
-                                            {rfp.prazo}
+                                            {rfp.prazo &&
+                                                (() => {
+                                                    const prazo = new Date(rfp.prazo);
+
+                                                    return (
+                                                        prazo
+                                                            .getDate()
+                                                            .toString()
+                                                            .padStart(2, '0') +
+                                                        '/' +
+                                                        (prazo.getMonth() + 1)
+                                                            .toString()
+                                                            .padStart(2, '0') +
+                                                        '/' +
+                                                        prazo.getFullYear()
+                                                    );
+                                                })()}
                                         </Typography>
                                         <Typography variant='body2' color='text.secondary'>
                                             {rfp.status}
@@ -239,7 +257,7 @@ const RFPClient: FC = () => {
                                         <Button size='small' color='error'>
                                             Excluir
                                         </Button>
-                                        {rfp.proposal.length ? (
+                                        {rfp.proposal && rfp.proposal.length ? (
                                             <Button
                                                 size='small'
                                                 color='success'
@@ -308,6 +326,7 @@ const RFPClient: FC = () => {
                                 </Card>
                             ))}
                         <ModalProposal
+                            key={modalProposal.proposal?.id}
                             open={modalProposal.show}
                             setProposal={setModalProposal}
                             proposal={modalProposal.proposal}
@@ -332,9 +351,10 @@ const RFPClient: FC = () => {
                 </Box>
             )}
             <ModalRfp
+                key={modalRfpSelect.rfp?.id}
                 open={modalRfpSelect.open}
                 setState={setModalRfpSelect}
-                rfp={modalRfpSelect.rfp}
+                data={{ rfp: modalRfpSelect.rfp, page: page, limit: limit }}
             />
         </Fragment>
     );

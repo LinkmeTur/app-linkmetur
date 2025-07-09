@@ -22,10 +22,17 @@ import {
     FaWindowClose,
 } from 'react-icons/fa';
 import Image from 'next/image';
-import { IService } from '@/app/store/reducers/jobs/jobs.slice';
+import { IRfp, IService } from '@/app/store/reducers/jobs/jobs.slice';
 import { Fragment, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
+import createRfp from '@/app/store/reducers/jobs/thunks/rfp/createRfp.thunk';
+import { useRouter } from 'next/navigation';
+import { setAlertApp } from '@/app/store/reducers/configApp/configApp.slice';
 
-export default function CardService({ service }: { service: IService }) {
+export default function CardService({ service }: { service: IService & { id: string } }) {
+    const router = useRouter();
+    const dispacth = useAppDispatch();
+    const { usuario } = useAppSelector((state) => state.auth);
     const [star, setStar] = useState<number>(0);
     const [open, setOpen] = useState<boolean>(false);
     const [imagemFull, setImagemFull] = useState<string>(service.photos[0].photo_URL || '');
@@ -36,6 +43,35 @@ export default function CardService({ service }: { service: IService }) {
         }
     }, []);
     const certifications = JSON.parse(service.certificacoes || '[]');
+    const handleRfp = () => {
+        const newRfp: Partial<IRfp> = {
+            prestadorID: service.corp?.id,
+            corpID: usuario.corpId as string,
+            titulo: service.nome_servico,
+            descricao: service.descricao,
+            detalhes: 'entrar em contato pra detalhes',
+            valor_medio: (service.max_valor - service.min_valor).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            }),
+            tipo: service.categoria,
+            jobID: service.id,
+        };
+
+        dispacth(createRfp(newRfp))
+            .unwrap()
+            .then((res) => {
+                if (!res) {
+                    throw new Error('Não foi possivel solicitar o serviço!');
+                }
+                router.push('/rfp');
+                setOpen(false);
+            })
+            .catch((err) => {
+                dispacth(setAlertApp({ message: err.message, type: 'error' }));
+                console.log(err);
+            });
+    };
     return (
         <Box>
             <Card className='rounded-lg flex flex-col md:flex-row'>
@@ -257,13 +293,10 @@ export default function CardService({ service }: { service: IService }) {
                                         color='textPrimary'
                                         mb={1}
                                     >
-                                        Prestador
+                                        Empresa
                                     </Typography>
                                     <Box display='flex' alignItems='center' mb={2}>
-                                        <Avatar
-                                            src={service.corp?.logo_url ?? undefined}
-                                            sx={{ mr: 2 }}
-                                        />
+                                        <Avatar src={service.corp?.logo_url} sx={{ mr: 2 }} />
                                         <Box>
                                             <Typography
                                                 variant='body2'
@@ -298,7 +331,7 @@ export default function CardService({ service }: { service: IService }) {
                                         </Box>
                                     </Box>
 
-                                    <Button variant='contained' disabled fullWidth>
+                                    <Button variant='contained' onClick={handleRfp} fullWidth>
                                         Solicitar Proposta
                                     </Button>
                                 </Paper>
