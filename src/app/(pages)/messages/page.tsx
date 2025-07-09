@@ -22,18 +22,16 @@ export default function Messages() {
     const [messages, setMessages] = useState<{ [key: string]: string[] }>({});
     const [input, setInput] = useState('');
     useEffect(() => {
-        const handleMessage = ({ from, message }) => {
-            setMessages((prev) => ({
-                ...prev,
-                [from]: [...(prev[from] || []), message],
-            }));
+        const han = () => {
+            socket.on('receive_message', ({ from, message }) => {
+                setMessages((prev) => ({
+                    ...prev,
+                    [from]: [...(prev[from] || []), message],
+                }));
+            });
+            return () => socket.off('receive_message');
         };
-
-        socket.on('receive_message', handleMessage);
-
-        return () => {
-            socket.off('receive_message', handleMessage); // remove exatamente o mesmo handler
-        };
+        han();
     }, []);
 
     const sendMessage = () => {
