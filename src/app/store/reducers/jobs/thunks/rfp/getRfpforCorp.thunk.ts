@@ -55,6 +55,26 @@ const getRfpForFilter = createAsyncThunk(
     },
 );
 
-const getRfpForPretador = createAsyncThunk('getRfpForPretador/GET', async () => {});
+const getRfpForPretador = createAsyncThunk(
+    'getRfpForPretador/GET',
+    async (
+        data: { prestadorID: string; page: number; limit: number; all: boolean },
+        { dispatch },
+    ) => {
+        try {
+            dispatch(setloading(true));
+            const { prestadorID, page, limit, all } = data;
+            const response = await api.doGet(`/request-for-proposal/prestador/${prestadorID}`, {
+                params: { page, limit, all },
+            });
+
+            dispatch(setloading(false));
+            return response;
+        } catch (error) {
+            console.error(error);
+            dispatch(setloading(false));
+        }
+    },
+);
 
 export { getRfpForCorp, getRfpForPretador, getAllRfp, getRfpForFilter };

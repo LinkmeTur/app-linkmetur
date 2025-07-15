@@ -2,8 +2,9 @@
 import { createSlice } from '@reduxjs/toolkit';
 import createJob from './thunks/createdJob.thunk';
 import { getJobs, getJobsForCorp } from './thunks/getJobs.thunk';
-import { getRfpForCorp } from './thunks/rfp/getRfpforCorp.thunk';
+import { getRfpForCorp, getRfpForFilter } from './thunks/rfp/getRfpforCorp.thunk';
 import updateRfp from './thunks/rfp/updateRfp.thunk';
+import { getRfpForPretador } from '@/app/store/reducers/jobs/thunks/rfp/getRfpforCorp.thunk';
 export interface IService {
     nome_servico: string;
     categoria: string;
@@ -78,9 +79,11 @@ export interface IProposal {
     prazo: Date;
     status: string;
     fotos?: {
+        id?: string;
         photo_URL: string;
         photo_alt: string;
     }[];
+    rfp: IRfp;
 }
 export interface IRequest {
     id?: string;
@@ -168,6 +171,14 @@ const jobsSlice = createSlice({
             state.serviceList = action.payload;
         });
         builder.addCase(getRfpForCorp.fulfilled, (state, action) => {
+            console.log('action.payload', action.payload);
+            state.rfpList = action.payload;
+        });
+        builder.addCase(getRfpForPretador.fulfilled, (state, action) => {
+            console.log('action.payload', action.payload);
+            state.rfpList = action.payload;
+        });
+        builder.addCase(getRfpForFilter.fulfilled, (state, action) => {
             console.log('action.payload', action.payload);
             state.rfpList = action.payload;
         });
