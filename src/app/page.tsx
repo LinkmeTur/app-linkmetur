@@ -1,6 +1,6 @@
 'use client';
 
-import Signin from './(pages)/signin/signin';
+import Signin from './components/signin/signin';
 export default function Home() {
     return <Signin />;
 }
