@@ -24,6 +24,7 @@ const store = () => {
         reducer: pesistedReducer,
         middleware: (getDefaultMiddleware) => {
             const defaultMiddleware = getDefaultMiddleware({
+                immutableCheck: false,
                 serializableCheck: false,
             });
 

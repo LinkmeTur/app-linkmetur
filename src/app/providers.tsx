@@ -138,6 +138,11 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                                     alt='Logo'
                                                     width={150}
                                                     height={100}
+                                                    style={{
+                                                        objectFit: 'contain',
+                                                        height: 'auto',
+                                                        width: 'auto',
+                                                    }}
                                                 />
                                             ),
                                         }}

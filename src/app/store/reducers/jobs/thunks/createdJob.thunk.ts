@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { IService } from '../jobs.slice';
 import api from '@/app/api/axios_HTTP';
 import { setAlertApp, setloading } from '../../configApp/configApp.slice';
+import { getJobsForCorp } from './getJobs.thunk';
 
 const createJob = createAsyncThunk(
     'job/post',
@@ -24,6 +25,7 @@ const createJob = createAsyncThunk(
                     open: true,
                 }),
             );
+            dispatch(getJobsForCorp({ corpId: body.corpId, page: 1, limit: 10 }));
             return response.data;
         } catch (error) {
             console.log(error);

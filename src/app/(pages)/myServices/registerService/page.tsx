@@ -11,8 +11,10 @@ import AvailabilitySection from './components/availability-section/availabilityS
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
 import { clearResgisterService } from '@/app/store/reducers/jobs/jobs.slice';
 import createJob from '@/app/store/reducers/jobs/thunks/createdJob.thunk';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterService() {
+    const router = useRouter();
     const dispatch = useAppDispatch();
     const activePage = useActivePage();
     const { registerService } = useAppSelector((state) => state.jobs);
@@ -23,9 +25,19 @@ export default function RegisterService() {
         if (usuario.corpId) {
             if (oneRas) {
                 const parsedRas = JSON.parse(oneRas);
-                dispatch(createJob({ id: usuario.corpId, job: parsedRas }));
+                dispatch(createJob({ id: usuario.corpId, job: parsedRas }))
+                    .unwrap()
+                    .then(() => {
+                        localStorage.removeItem('registerService');
+                        router.push('/myServices');
+                    });
             } else if (registerService) {
-                dispatch(createJob({ id: usuario.corpId, job: registerService }));
+                dispatch(createJob({ id: usuario.corpId, job: registerService }))
+                    .unwrap()
+                    .then(() => {
+                        localStorage.removeItem('registerService');
+                        router.push('/myServices');
+                    });
             }
         }
     };

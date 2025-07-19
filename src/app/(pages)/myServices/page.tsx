@@ -127,9 +127,12 @@ export default function MyServices() {
 
                     <div className='space-y-4'>
                         {/* <!-- Result Card 1 --> */}
-                        {resultList.jobs.map((service) => (
-                            <CardService key={service.id} service={service} />
-                        ))}
+                        {resultList &&
+                            Array.isArray(resultList.jobs) &&
+                            resultList.jobs.length > 0 &&
+                            resultList.jobs.map((service) => (
+                                <CardService key={service.id} service={service} />
+                            ))}
 
                         {/* <!-- Pagination --> */}
                         <div id='pagination' className='flex items-center justify-center mt-6'>
