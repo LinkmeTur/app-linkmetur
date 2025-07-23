@@ -48,7 +48,7 @@ export default function FormResetPass({ slug }: { slug: string }) {
                 setErrorPass(false);
                 setSenha('');
                 setRepeteSenha('');
-                router.push('/signin');
+                router.push('/');
             })
             .catch((err) => {
                 console.log(err);

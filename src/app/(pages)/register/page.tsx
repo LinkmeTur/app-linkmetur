@@ -122,7 +122,7 @@ export default function Register() {
             dispatch(setloading(false));
             dispatch(clearCorporationState());
             dispatch(clearUserState());
-            router.push('/signin');
+            router.push('/');
         });
     };
 
@@ -442,6 +442,10 @@ export default function Register() {
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                             />
+                            <Typography variant='body2' textAlign={'center'} mt={2}>
+                                Um código de validação foi enviado para sua caixa
+                                <br /> de mensagens,verifique também a caixa de spam
+                            </Typography>
                             <Button
                                 variant='contained'
                                 fullWidth
