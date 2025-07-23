@@ -133,7 +133,7 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
                                                     src={
                                                         !logo
                                                             ? logoPath + 'logoblackp.svg'
-                                                            : logoPath + 'logowhitep.svg'
+                                                            : logoPath + 'logoWhitep.svg'
                                                     }
                                                     alt='Logo'
                                                     width={150}
