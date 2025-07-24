@@ -25,6 +25,7 @@ type InitialCorporationState = {
     estado: string | null;
     pais: string | null;
     localizacao: string | null;
+    created_at: Date | null;
     profile: {
         id?: string | null;
         corpID?: string;
@@ -74,6 +75,7 @@ const initialState: InitialCorporationState = {
         redesSociais: '',
     },
     users: [],
+    created_at: null,
 };
 
 const corporationSlice = createSlice({

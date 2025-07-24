@@ -1,7 +1,8 @@
 'use client';
+import { useThemeMode } from '@/app/themes/themeMode.context';
 import { Card } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { JSX } from 'react';
+import { JSX, useEffect, useState } from 'react';
 
 interface TCarFastAction {
     goPath: string;
@@ -13,12 +14,29 @@ interface TCarFastAction {
 
 function CarFastAction({ goPath, icon, iconColor, title, subTitle }: TCarFastAction) {
     const router = useRouter();
+    const theme = useThemeMode();
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        if (theme === 'dark') {
+            setIsDark(true);
+            return;
+        }
+        setIsDark(false);
+    }, [theme]);
+
     return (
         <Card
             id='action-new-service'
             className=' rounded-lg  p-4 '
             onClick={() => {
                 router.push(goPath);
+            }}
+            sx={{
+                cursor: 'pointer',
+                '&:hover': {
+                    backgroundColor: isDark ? '#282828ff' : '#f3f3f3ff',
+                },
             }}
         >
             <div className='flex items-center space-x-3'>

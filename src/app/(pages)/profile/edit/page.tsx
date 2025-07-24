@@ -116,7 +116,9 @@ export default function EditProlile() {
                         },
                     },
                 }),
-            );
+            )
+                .unwrap()
+                .then(() => router.push('/profile'));
         }
     };
     return (
@@ -626,6 +628,28 @@ export default function EditProlile() {
                                         },
                                     }}
                                 />
+                                <TextField
+                                    label={'Certificações'}
+                                    name={'profile.certificacoes'}
+                                    value={companyData?.profile?.certificacoes}
+                                    onChange={handleChange}
+                                    margin='dense'
+                                    size='small'
+                                    helperText='Separe cada Certificão por " ; "'
+                                    fullWidth
+                                    slotProps={{
+                                        input: {
+                                            style: {
+                                                fontSize: '0.7em',
+                                            },
+                                        },
+                                        inputLabel: {
+                                            style: {
+                                                fontSize: '0.8em',
+                                            },
+                                        },
+                                    }}
+                                />
                                 <Stack
                                     direction={'row'}
                                     gap={1}
@@ -836,7 +860,6 @@ export default function EditProlile() {
                                     key={user.id}
                                     className='flex items-center gap-2 px-4 w-full justify-between'
                                     sx={{
-                                        bgcolor: 'grey.200',
                                         borderRadius: 2,
                                         boxShadow: 'none',
                                     }}
@@ -880,7 +903,6 @@ export default function EditProlile() {
                                                 key={u.id}
                                                 className='flex items-center gap-2 px-4 w-full justify-between'
                                                 sx={{
-                                                    bgcolor: 'grey.200',
                                                     borderRadius: 2,
                                                     boxShadow: 'none',
                                                 }}

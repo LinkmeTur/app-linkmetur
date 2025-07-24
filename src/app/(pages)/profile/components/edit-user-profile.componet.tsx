@@ -26,6 +26,7 @@ import createUser from '@/app/store/reducers/user/thunks/createUser.thunk';
 import { formatPhone } from '@/app/config/functions/formatPhone';
 import { cleanCaracters } from '@/app/config/functions/cleanCaracters';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import getOneUser from '@/app/store/reducers/user/thunks/getOneUser.thunk';
 
 interface IModalUser {
     open: boolean;
@@ -79,11 +80,15 @@ export default function ModalUserEditOrCreate({ open, onClose, user, mode }: IMo
                 nivel,
                 avatar_url: avatar,
                 senha: password,
-                corpId: user?.corpId as string,
+                corpId: usuario?.corpId as string,
             };
             dispatch(createUser({ user: userNew, id: usuario?.id as string }))
                 .unwrap()
-                .then(() => onClose());
+                .then(() =>
+                    dispatch(getOneUser(usuario.id as string))
+                        .unwrap()
+                        .then(() => onClose()),
+                );
         } else if (mode === 'edit') {
             // eslint-disable-next-line prefer-const
             let userEdit: Partial<TUser & Record<'senha', string>> = {};
@@ -96,7 +101,11 @@ export default function ModalUserEditOrCreate({ open, onClose, user, mode }: IMo
             if (password && password !== confirmPassword) userEdit.senha = password;
             dispatch(updateUser({ user: userEdit, id: usuario?.id as string }))
                 .unwrap()
-                .then(() => onClose());
+                .then(() =>
+                    dispatch(getOneUser(usuario.id as string))
+                        .unwrap()
+                        .then(() => onClose()),
+                );
         }
     };
     return (

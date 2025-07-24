@@ -9,7 +9,8 @@ const editProfileCorp = createAsyncThunk(
     async (data: { corp: Partial<TCorporation>; id: string }, { dispatch }) => {
         try {
             dispatch(setloading(true));
-            const { profile, ...corporation } = data.corp;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { profile, users, ...corporation } = data.corp;
             await api.doPatch(`/corporations/${corporation.id}`, corporation);
 
             const foundCorpProfile = await api.doGet(`/corporation-profile/corp/${corporation.id}`);
@@ -35,6 +36,10 @@ const editProfileCorp = createAsyncThunk(
             const foundCorpProfileAtt = await api.doGet(
                 `/corporation-profile/corp/${corporation.id}`,
             );
+            await api.doPatch(`/corporations/${corporation.id}`, {
+                profileId: foundCorpProfileAtt.id,
+            });
+
             const attUser = await api.doGet(`/users/${data.id}`);
             console.log('user', attUser);
             if (attUser && foundCorpProfileAtt) {

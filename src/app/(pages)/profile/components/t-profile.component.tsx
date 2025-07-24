@@ -1,15 +1,26 @@
 'use client';
 
 import { formatPhone } from '@/app/config/functions/formatPhone';
+import { useAppDispatch } from '@/app/store/hooks/hooks';
+import getOneCorp from '@/app/store/reducers/corporation/thunks/getOneCorp.thunk';
 import { TUser } from '@/app/store/reducers/user/user.slice';
 import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { FaHeart, FaUserEdit } from 'react-icons/fa';
+import { useEffect } from 'react';
+import { FaUserEdit } from 'react-icons/fa';
 
 export function TProfile({ user }: { user: TUser }) {
     const router = useRouter();
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        dispatch(getOneCorp(user.corpId as string))
+            .unwrap()
+            .then((res) => {
+                console.log(res);
+            });
+    });
 
     return (
         <PageContainer title='' breadcrumbs={[]}>
@@ -66,13 +77,6 @@ export function TProfile({ user }: { user: TUser }) {
                                 >
                                     Editar
                                 </Button>
-                                {/* <Button
-                                    startIcon={<FaHeart />}
-                                    id='btn-favorite'
-                                    className='bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-md shadow-sm font-medium text-sm flex items-center'
-                                >
-                                    Favoritar
-                                </Button> */}
                             </Stack>
                         </Box>
                     </Stack>
@@ -83,9 +87,7 @@ export function TProfile({ user }: { user: TUser }) {
                     <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
                         <div className='lg:col-span-2'>
                             <section id='basic-info' className='mb-8'>
-                                <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                                    Informações Básicas
-                                </h3>
+                                <h3 className='text-lg font-semibold  mb-4'>Informações Básicas</h3>
 
                                 <div className='space-y-4'>
                                     <div className='flex'>
@@ -95,7 +97,7 @@ export function TProfile({ user }: { user: TUser }) {
                                             </span>
                                         </div>
                                         <div className='flex-1'>
-                                            <span className='text-sm text-gray-800'>
+                                            <span className='text-sm '>
                                                 {user?.corp?.nome_fantasia ||
                                                     user?.corp?.razao_social}
                                             </span>
@@ -109,7 +111,7 @@ export function TProfile({ user }: { user: TUser }) {
                                             </span>
                                         </div>
                                         <div className='flex-1'>
-                                            <span className='text-sm text-gray-800'>
+                                            <span className='text-sm '>
                                                 {user?.corp?.endereco}, {user?.corp?.numero} -{' '}
                                                 {user?.corp?.bairro}, {user?.corp?.cidade} -{' '}
                                                 {user?.corp?.estado}
@@ -124,7 +126,7 @@ export function TProfile({ user }: { user: TUser }) {
                                             </span>
                                         </div>
                                         <div className='flex-1'>
-                                            <span className='text-sm text-gray-800'>
+                                            <span className='text-sm '>
                                                 {user?.corp?.cnae_fiscal_principal}
                                             </span>
                                         </div>
@@ -137,7 +139,7 @@ export function TProfile({ user }: { user: TUser }) {
                                             </span>
                                         </div>
                                         <div className='flex-1'>
-                                            <span className='text-sm text-gray-800'>
+                                            <span className='text-sm '>
                                                 {formatPhone(user?.corp?.telefone as string)}
                                             </span>
                                         </div>
@@ -150,9 +152,7 @@ export function TProfile({ user }: { user: TUser }) {
                                             </span>
                                         </div>
                                         <div className='flex-1'>
-                                            <span className='text-sm text-gray-800'>
-                                                {user?.corp?.email}
-                                            </span>
+                                            <span className='text-sm '>{user?.corp?.email}</span>
                                         </div>
                                     </div>
 
@@ -172,9 +172,7 @@ export function TProfile({ user }: { user: TUser }) {
                             </section>
 
                             <section id='about-company' className='mb-8'>
-                                <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                                    Sobre a Empresa
-                                </h3>
+                                <h3 className='text-lg font-semibold  mb-4'>Sobre a Empresa</h3>
                                 <p className='text-sm text-gray-700 mb-4'>
                                     {user?.corp?.profile?.descricao}.
                                 </p>
@@ -182,126 +180,28 @@ export function TProfile({ user }: { user: TUser }) {
                                     {user?.corp?.profile?.sobre}
                                 </p>
                             </section>
-
-                            <section id='services-offered'>
-                                <h3 className='text-lg font-semibold text-gray-800 mb-4'>
-                                    Serviços Contratados
-                                </h3>
-
-                                <div className='space-y-4'>
-                                    <div
-                                        id='service-item-1'
-                                        className='border border-gray-200 rounded-lg p-4 hover:shadow-sm transition'
-                                    >
-                                        <div className='flex items-start'>
-                                            <div className='h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-500 mr-4 flex-shrink-0'>
-                                                <i className='fa-solid fa-camera text-xl'></i>
-                                            </div>
-                                            <div className='flex-1'>
-                                                <h4 className='font-medium text-gray-800 mb-1'>
-                                                    Fotografia Profissional
-                                                </h4>
-                                                <div className='flex items-center mb-2'>
-                                                    <div className='flex text-amber-400 text-xs'>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                    </div>
-                                                    <span className='text-gray-500 text-xs ml-2'>
-                                                        Avaliado em 18/03/2025
-                                                    </span>
-                                                </div>
-                                                <p className='text-sm text-gray-600'>
-                                                    &quot;Excelente serviço! As fotos capturaram
-                                                    perfeitamente a essência das nossas atividades
-                                                    de ecoturismo. Recomendamos!&quot;
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        id='service-item-2'
-                                        className='border border-gray-200 rounded-lg p-4 hover:shadow-sm transition'
-                                    >
-                                        <div className='flex items-start'>
-                                            <div className='h-12 w-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-500 mr-4 flex-shrink-0'>
-                                                <i className='fa-solid fa-globe text-xl'></i>
-                                            </div>
-                                            <div className='flex-1'>
-                                                <h4 className='font-medium text-gray-800 mb-1'>
-                                                    Desenvolvimento de Website
-                                                </h4>
-                                                <div className='flex items-center mb-2'>
-                                                    <div className='flex text-amber-400 text-xs'>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-regular fa-star'></i>
-                                                    </div>
-                                                    <span className='text-gray-500 text-xs ml-2'>
-                                                        Avaliado em 05/02/2025
-                                                    </span>
-                                                </div>
-                                                <p className='text-sm text-gray-600'>
-                                                    &quot;Nosso site ficou muito bom, moderno e
-                                                    responsivo. Apenas tivemos alguns atrasos na
-                                                    entrega, mas o resultado final compensou.&quot;
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        id='service-item-3'
-                                        className='border border-gray-200 rounded-lg p-4 hover:shadow-sm transition'
-                                    >
-                                        <div className='flex items-start'>
-                                            <div className='h-12 w-12 rounded-lg bg-green-100 flex items-center justify-center text-green-500 mr-4 flex-shrink-0'>
-                                                <i className='fa-solid fa-leaf text-xl'></i>
-                                            </div>
-                                            <div className='flex-1'>
-                                                <h4 className='font-medium text-gray-800 mb-1'>
-                                                    Consultoria em Sustentabilidade
-                                                </h4>
-                                                <div className='flex items-center mb-2'>
-                                                    <div className='flex text-amber-400 text-xs'>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star'></i>
-                                                        <i className='fa-solid fa-star-half-stroke'></i>
-                                                    </div>
-                                                    <span className='text-gray-500 text-xs ml-2'>
-                                                        Avaliado em 22/01/2025
-                                                    </span>
-                                                </div>
-                                                <p className='text-sm text-gray-600'>
-                                                    &quot;A consultoria nos ajudou a implementar
-                                                    práticas sustentáveis em todas as nossas
-                                                    operações. As orientações foram claras e
-                                                    práticas.&quot;
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
                         </div>
 
                         <div className='lg:col-span-1'>
-                            <section id='company-stats' className='bg-gray-50 rounded-lg p-6 mb-6'>
+                            <Paper id='company-stats' className='bg-gray-200 rounded-lg p-6 mb-6'>
                                 <h3 className='text-lg font-semibold text-gray-800 mb-4'>
                                     Estatísticas
                                 </h3>
 
                                 <div className='space-y-4'>
                                     <div className='flex items-center justify-between'>
-                                        <span className='text-sm text-gray-600'>Membro desde</span>
-                                        <span className='text-sm font-medium'>Março 2025</span>
+                                        <span className='text-sm text-gray-700'>Membro desde</span>
+                                        <span className='text-sm text-gray-500 font-medium'>
+                                            {user.corp?.created_at
+                                                ? new Date(
+                                                      user.corp?.created_at,
+                                                  ).toLocaleDateString('pt-BR', {
+                                                      day: '2-digit',
+                                                      month: '2-digit',
+                                                      year: 'numeric',
+                                                  })
+                                                : null}
+                                        </span>
                                     </div>
 
                                     <div className='flex items-center justify-between'>
@@ -334,7 +234,7 @@ export function TProfile({ user }: { user: TUser }) {
                                         </div>
                                     </div>
                                 </div>
-                            </section>
+                            </Paper>
 
                             <section
                                 id='company-certifications'

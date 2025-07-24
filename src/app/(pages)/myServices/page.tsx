@@ -44,7 +44,7 @@ export default function MyServices() {
             }
             dispatch(
                 getJobsForCorp({
-                    corpId: usuario.corp.id as string,
+                    corpId: usuario.corpId as string,
                     ...filters,
                     page,
                     limit,

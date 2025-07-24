@@ -18,6 +18,7 @@ import { LicenseInfo } from '@mui/x-license';
 import LinkmeTurAppBar from './components/appBar/appbar';
 import { IoMoon, IoSunny } from 'react-icons/io5';
 import SuspenseFallback from './supense-fallback';
+import { ThemeModeContext } from './themes/themeMode.context';
 
 LicenseInfo.setLicenseKey(
     '1919867ea7d28016281f8bfff8ea8d58Tz02NDc0LEU9MjAwMzc4MTg0ODAwMCxTPXByZW1pdW0sTE09c3Vic2NyaXB0aW9uLEtWPTI=',
@@ -25,6 +26,7 @@ LicenseInfo.setLicenseKey(
 
 export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }) {
     const [thisTheme, setThisTheme] = useState<Theme>(themeDark);
+    const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
     const [logo, setLogo] = useState<boolean>(false);
     const [logoPath, setLogoPath] = useState<string>('/');
     const [showLayoutDashboard, setShowLayoutDashboard] = useState<boolean>(false);
@@ -76,9 +78,11 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
         } else if (themeMode === 'dark') {
             setLogo(false);
             setThisTheme(themeDark);
+            setThemeMode('dark');
         } else {
             setLogo(true);
             setThisTheme(themelight);
+            setThemeMode('light');
         }
     }, []);
 
@@ -114,92 +118,96 @@ export function LinkMeTurAppProvider({ children }: { children: React.ReactNode }
         }
     }, [dashboardLayoutNavigation, pathname]);
     return (
-        <Provider store={useStore}>
-            <PersistGate loading={null} persistor={persistor}>
-                <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-                    {showLayoutDashboard ? (
-                        <ThemeProvider theme={thisTheme}>
-                            <NextAppProvider
-                                navigation={dashboardLayoutNavigation}
-                                theme={{ dark: themeDark, light: themelight }}
-                            >
-                                <SuspenseFallback>
-                                    <DashboardLayout
-                                        defaultSidebarCollapsed
-                                        branding={{
-                                            title: `${titleTab}`,
-                                            logo: (
-                                                <Image
-                                                    src={
-                                                        !logo
-                                                            ? logoPath + 'logoblackp.svg'
-                                                            : logoPath + 'logoWhitep.svg'
-                                                    }
-                                                    alt='Logo'
-                                                    width={150}
-                                                    height={100}
-                                                    style={{
-                                                        objectFit: 'contain',
-                                                        height: 'auto',
-                                                        width: 'auto',
-                                                    }}
-                                                />
-                                            ),
-                                        }}
-                                        slots={{
-                                            toolbarActions: () => (
-                                                <Fragment>
-                                                    <LinkmeTurAppBar />
-                                                    <IconButton
-                                                        onClick={() => {
-                                                            if (istheme.getTheme() === 'dark') {
-                                                                istheme.setTheme('light');
-                                                                setLogo(true);
-                                                                setThisTheme(themelight);
-                                                            } else {
-                                                                istheme.setTheme('dark');
-                                                                setLogo(false);
-                                                                setThisTheme(themeDark);
-                                                            }
+        <ThemeModeContext.Provider value={themeMode}>
+            <Provider store={useStore}>
+                <PersistGate loading={null} persistor={persistor}>
+                    <AppRouterCacheProvider options={{ enableCssLayer: true }}>
+                        {showLayoutDashboard ? (
+                            <ThemeProvider theme={thisTheme}>
+                                <NextAppProvider
+                                    navigation={dashboardLayoutNavigation}
+                                    theme={{ dark: themeDark, light: themelight }}
+                                >
+                                    <SuspenseFallback>
+                                        <DashboardLayout
+                                            defaultSidebarCollapsed
+                                            branding={{
+                                                title: `${titleTab}`,
+                                                logo: (
+                                                    <Image
+                                                        src={
+                                                            !logo
+                                                                ? logoPath + 'logoblackp.svg'
+                                                                : logoPath + 'logoWhitep.svg'
+                                                        }
+                                                        alt='Logo'
+                                                        width={150}
+                                                        height={100}
+                                                        style={{
+                                                            objectFit: 'contain',
+                                                            height: 'auto',
+                                                            width: 'auto',
                                                         }}
-                                                        color='primary'
-                                                    >
-                                                        {logo ? <IoMoon /> : <IoSunny />}
-                                                    </IconButton>
-                                                </Fragment>
-                                            ),
-                                            sidebarFooter: ({ mini }) => (
-                                                <Fragment>
-                                                    <Divider />
-                                                    <Typography
-                                                        variant='caption'
-                                                        sx={{
-                                                            m: 1,
-                                                            textAlign: 'center',
-                                                            overflow: 'hidden',
-                                                        }}
-                                                    >
-                                                        {mini
-                                                            ? '© 2025'
-                                                            : `© 2025 Desenvolvido por Linkme Tur.`}
-                                                    </Typography>
-                                                </Fragment>
-                                            ),
-                                        }}
-                                    >
-                                        {children}
-                                    </DashboardLayout>
-                                </SuspenseFallback>
-                            </NextAppProvider>
-                        </ThemeProvider>
-                    ) : (
-                        <ThemeProvider theme={themelight}>
-                            <CssBaseline />
-                            <SuspenseFallback>{children}</SuspenseFallback>
-                        </ThemeProvider>
-                    )}
-                </AppRouterCacheProvider>
-            </PersistGate>
-        </Provider>
+                                                    />
+                                                ),
+                                            }}
+                                            slots={{
+                                                toolbarActions: () => (
+                                                    <Fragment>
+                                                        <LinkmeTurAppBar />
+                                                        <IconButton
+                                                            onClick={() => {
+                                                                if (istheme.getTheme() === 'dark') {
+                                                                    istheme.setTheme('light');
+                                                                    setLogo(true);
+                                                                    setThisTheme(themelight);
+                                                                    setThemeMode('light');
+                                                                } else {
+                                                                    istheme.setTheme('dark');
+                                                                    setLogo(false);
+                                                                    setThisTheme(themeDark);
+                                                                    setThemeMode('dark');
+                                                                }
+                                                            }}
+                                                            color='primary'
+                                                        >
+                                                            {logo ? <IoMoon /> : <IoSunny />}
+                                                        </IconButton>
+                                                    </Fragment>
+                                                ),
+                                                sidebarFooter: ({ mini }) => (
+                                                    <Fragment>
+                                                        <Divider />
+                                                        <Typography
+                                                            variant='caption'
+                                                            sx={{
+                                                                m: 1,
+                                                                textAlign: 'center',
+                                                                overflow: 'hidden',
+                                                            }}
+                                                        >
+                                                            {mini
+                                                                ? '© 2025'
+                                                                : `© 2025 Desenvolvido por Linkme Tur.`}
+                                                        </Typography>
+                                                    </Fragment>
+                                                ),
+                                            }}
+                                        >
+                                            {children}
+                                        </DashboardLayout>
+                                    </SuspenseFallback>
+                                </NextAppProvider>
+                            </ThemeProvider>
+                        ) : (
+                            <ThemeProvider theme={themelight}>
+                                <CssBaseline />
+                                <SuspenseFallback>{children}</SuspenseFallback>
+                            </ThemeProvider>
+                        )}
+                    </AppRouterCacheProvider>
+                </PersistGate>
+            </Provider>
+        </ThemeModeContext.Provider>
     );
 }
