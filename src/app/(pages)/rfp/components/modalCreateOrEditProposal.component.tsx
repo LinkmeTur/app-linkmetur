@@ -2,6 +2,7 @@ import { deleteFile, sendFileS3 } from '@/app/api/awsS3';
 import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
 import { IProposal, IRfp } from '@/app/store/reducers/jobs/jobs.slice';
 import createProposal from '@/app/store/reducers/jobs/thunks/proposal/createProposal.thunk';
+import updateProposal from '@/app/store/reducers/jobs/thunks/proposal/updateProposal.thunk';
 import { Delete, PhotoCamera } from '@mui/icons-material';
 import {
     Box,
@@ -18,7 +19,7 @@ import {
     Typography,
 } from '@mui/material';
 import Image from 'next/image';
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type TFotos = {
     id?: string;
@@ -42,17 +43,22 @@ export default function ModalCreateOrEditProposal(props: {
         }>
     >;
 }) {
-    const dataBR =
-        props.content.mode === 'edit'
-            ? (props.content.proposal?.prazo.toLocaleDateString('pt-BR') as string)
-            : '';
     const dispatch = useAppDispatch();
     const { usuario } = useAppSelector((state) => state.auth);
     const [descricao, setDescricao] = useState<string>('');
     const [detalhes, setDetalhes] = useState<string>('');
     const [valor, setValor] = useState<string>('');
-    const [prazo, setPrazo] = useState<string>(dataBR);
+    const [prazo, setPrazo] = useState<string>('');
     const [fotos, setFotos] = useState<TFotos>([]);
+    useEffect(() => {
+        if (props.content.mode === 'edit') {
+            setDescricao(props.content.proposal?.resumo_proposta as string);
+            setDetalhes(props.content.proposal?.observações as string);
+            setValor(props.content.proposal?.valor_proposta as string);
+            setFotos(props.content.proposal?.fotos as TFotos);
+            setPrazo(new Date(props.content.proposal?.prazo as Date).toISOString().split('T')[0]);
+        }
+    }, [props.content]);
     const handleImageUpload = async (event: ChangeEvent<HTMLInputElement>) => {
         if (fotos.length > 5) return;
 
@@ -97,7 +103,7 @@ export default function ModalCreateOrEditProposal(props: {
         if (props.content.mode === 'edit') {
             //update
             console.log('foi');
-            // dispatch(updateProposal(proposal)).unwrap().then(handleClose);
+            dispatch(updateProposal(proposal)).unwrap().then(handleClose);
         } else {
             //create
 

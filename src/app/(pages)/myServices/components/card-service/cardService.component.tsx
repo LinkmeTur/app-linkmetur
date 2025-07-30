@@ -331,9 +331,11 @@ export default function CardService({ service }: { service: IService & { id: str
                                         </Box>
                                     </Box>
 
-                                    <Button variant='contained' onClick={handleRfp} fullWidth>
-                                        Solicitar Proposta
-                                    </Button>
+                                    {usuario.corp?.tipo === 'T' && (
+                                        <Button variant='contained' onClick={handleRfp} fullWidth>
+                                            Solicitar Proposta
+                                        </Button>
+                                    )}
                                 </Paper>
                                 {certifications && certifications.length && (
                                     <Fragment>

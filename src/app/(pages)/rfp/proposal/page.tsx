@@ -298,8 +298,8 @@ const RFPPrestador: FC = () => {
                                                 ))}
                                             </CardMedia>
                                         )}
-                                    {rfp.proposal && rfp.proposal.length ? (
-                                        rfp.proposal.map((p) => {
+                                    {rfp.proposals && rfp.proposals.length ? (
+                                        rfp.proposals.map((p) => {
                                             if (p.prestadorID === usuario.corpId) {
                                                 return (
                                                     <CardActionArea key={p.id}>

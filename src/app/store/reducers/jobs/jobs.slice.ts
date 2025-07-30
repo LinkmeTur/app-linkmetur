@@ -65,7 +65,7 @@ export interface IRfp {
         photo_URL: string;
         photo_alt: string;
     }[];
-    proposal: Array<IProposal>;
+    proposals: Array<IProposal>;
 }
 export interface IProposal {
     id?: string;
