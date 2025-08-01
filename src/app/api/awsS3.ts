@@ -40,7 +40,7 @@ export async function sendFileS3(key: string, file: File) {
 }
 export async function deleteFile(key: string, file_URL: string) {
     const fileKey = file_URL.split('/');
-    alert(fileKey[fileKey.length - 1]);
+
     const params = {
         Bucket: 'linkmeturimages2025',
         Key: key + '/' + fileKey[fileKey.length - 1],

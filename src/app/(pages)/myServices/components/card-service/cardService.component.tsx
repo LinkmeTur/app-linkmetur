@@ -35,7 +35,7 @@ export default function CardService({ service }: { service: IService & { id: str
     const { usuario } = useAppSelector((state) => state.auth);
     const [star, setStar] = useState<number>(0);
     const [open, setOpen] = useState<boolean>(false);
-    const [imagemFull, setImagemFull] = useState<string>(service.photos[0].photo_URL || '');
+    const [imagemFull, setImagemFull] = useState<string>(service?.photos[0]?.photo_URL || '');
     useEffect(() => {
         if (service.evaluations && service.evaluations.length > 0) {
             const allStar = service.evaluations.reduce((acc, cur) => acc + cur.rating, 0);
@@ -77,8 +77,8 @@ export default function CardService({ service }: { service: IService & { id: str
             <Card className='rounded-lg flex flex-col md:flex-row'>
                 <CardMedia className='md:w-1/3 h-48 md:h-auto bg-gray-200 relative'>
                     <Image
-                        src={service.photos[0].photo_URL}
-                        alt={service.photos[0].photo_alt}
+                        src={service?.photos[0]?.photo_URL}
+                        alt={service?.photos[0]?.photo_alt}
                         width={300}
                         height={300}
                         className='w-full h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none'

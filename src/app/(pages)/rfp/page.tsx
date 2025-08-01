@@ -30,13 +30,13 @@ import {
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { LiaBusinessTimeSolid } from 'react-icons/lia';
 import Image from 'next/image';
-import { FC, Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import ModalRfp from './components/modalRfp.component';
 import { IProposal, IRfp } from '@/app/store/reducers/jobs/jobs.slice';
 import ModalProposal from './components/modalProposal.component';
 import { getRfpForCorp } from '@/app/store/reducers/jobs/thunks/rfp/getRfpforCorp.thunk';
 
-const RFPClient: FC = () => {
+export default function RFP() {
     const dispatch = useAppDispatch();
     const { rfpList } = useAppSelector((state) => state.jobs);
     const { usuario } = useAppSelector((state) => state.auth);
@@ -93,7 +93,7 @@ const RFPClient: FC = () => {
         console.log('buscar');
     };
     return (
-        <Fragment>
+        <PageContainer title='' breadcrumbs={[]} className='p-0 w-full'>
             <Paper elevation={12}>
                 <Box className='flex items-center justify-between px-6 my-4'>
                     <Typography variant='h5' className='font-bold'>
@@ -270,55 +270,56 @@ const RFPClient: FC = () => {
                                                 </CardMedia>
                                             )}
                                         {proposalview.show && proposalview.id === rfp.id && (
-                                            <CardActionArea>
-                                                <Divider />
+                                            <List sx={{ width: '100%' }}>
                                                 <Box className='flex items-center justify-between px-6 my-4'>
-                                                    <h2 className='text-lg font-semibold text-gray-500'>
-                                                        Propostas
+                                                    <h2 className='text-lg font-semibold '>
+                                                        {usuario.corp?.tipo === 'P'
+                                                            ? 'Proposta'
+                                                            : 'Propostas'}
                                                     </h2>
                                                 </Box>
-                                                <List>
-                                                    {rfp.proposal.map((p) => (
-                                                        <Fragment key={p.id}>
-                                                            <ListItem
-                                                                component='button'
-                                                                onClick={() =>
-                                                                    setModalProposal({
-                                                                        show: true,
-                                                                        proposal: p,
-                                                                    })
+                                                {rfp.proposals.map((p) => (
+                                                    <CardActionArea
+                                                        key={p.id}
+                                                        onClick={() =>
+                                                            setModalProposal({
+                                                                show: true,
+                                                                proposal: p,
+                                                            })
+                                                        }
+                                                        sx={{
+                                                            width: '100%',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                    >
+                                                        <ListItem className='w-full flex items-center justify-center gap-2'>
+                                                            <ListItemAvatar>
+                                                                <Avatar>
+                                                                    <LiaBusinessTimeSolid />
+                                                                </Avatar>
+                                                            </ListItemAvatar>
+                                                            <ListItemText
+                                                                primary={p.nome_empresa}
+                                                                secondary={
+                                                                    <Fragment>
+                                                                        <Typography
+                                                                            sx={{
+                                                                                display: 'inline',
+                                                                            }}
+                                                                            component='span'
+                                                                            variant='body2'
+                                                                            color='text.primary'
+                                                                        >
+                                                                            {p.resumo_proposta}
+                                                                        </Typography>
+                                                                        {` — ${p.valor_proposta}`}
+                                                                    </Fragment>
                                                                 }
-                                                            >
-                                                                <ListItemAvatar>
-                                                                    <Avatar>
-                                                                        <LiaBusinessTimeSolid />
-                                                                    </Avatar>
-                                                                </ListItemAvatar>
-                                                                <ListItemText
-                                                                    primary={p.nome_empresa}
-                                                                    secondary={
-                                                                        <Fragment>
-                                                                            <Typography
-                                                                                sx={{
-                                                                                    display:
-                                                                                        'inline',
-                                                                                }}
-                                                                                component='span'
-                                                                                variant='body2'
-                                                                                color='text.primary'
-                                                                            >
-                                                                                {p.resumo_proposta}
-                                                                            </Typography>
-                                                                            {` — ${p.valor_proposta}`}
-                                                                        </Fragment>
-                                                                    }
-                                                                />
-                                                            </ListItem>
-                                                            <Divider />
-                                                        </Fragment>
-                                                    ))}
-                                                </List>
-                                            </CardActionArea>
+                                                            />
+                                                        </ListItem>
+                                                    </CardActionArea>
+                                                ))}
+                                            </List>
                                         )}
                                     </Stack>
 
@@ -335,7 +336,7 @@ const RFPClient: FC = () => {
                                         <Button size='small' color='error'>
                                             Excluir
                                         </Button>
-                                        {rfp.proposal && rfp.proposal.length ? (
+                                        {rfp.proposals && rfp.proposals.length ? (
                                             <Button
                                                 size='small'
                                                 color='success'
@@ -343,8 +344,8 @@ const RFPClient: FC = () => {
                                                     setProposalview({ show: true, id: rfp.id })
                                                 }
                                             >
-                                                {rfp.proposal.length > 1
-                                                    ? `Visualizar Propostas(${rfp.proposal.length})`
+                                                {rfp.proposals.length > 1
+                                                    ? `Visualizar Propostas(${rfp.proposals.length})`
                                                     : 'Visualizar Proposta'}
                                             </Button>
                                         ) : (
@@ -353,12 +354,6 @@ const RFPClient: FC = () => {
                                     </CardActions>
                                 </Card>
                             ))}
-                        <ModalProposal
-                            key={modalProposal.proposal?.id}
-                            open={modalProposal.show}
-                            setProposal={setModalProposal}
-                            proposal={modalProposal.proposal}
-                        />
                     </Box>
                     <Box id='pagination' className='flex items-center justify-center mt-6'>
                         <Pagination
@@ -378,6 +373,12 @@ const RFPClient: FC = () => {
                     </Typography>
                 </Box>
             )}
+            <ModalProposal
+                key={modalProposal.proposal?.id}
+                open={modalProposal.show}
+                setProposal={setModalProposal}
+                proposal={modalProposal.proposal}
+            />
             <ModalRfp
                 key={modalRfpSelect.rfp?.id}
                 open={modalRfpSelect.open}
@@ -405,15 +406,6 @@ const RFPClient: FC = () => {
                     className='w-[400px]  object-cover rounded-md'
                 />
             </Modal>
-        </Fragment>
-    );
-};
-
-export default function RFP() {
-    const { corp } = useAppSelector((state) => state.auth.usuario);
-    return (
-        <PageContainer title='' breadcrumbs={[]} className='p-0 w-full'>
-            {corp?.tipo === 'T' && <RFPClient />}
         </PageContainer>
     );
 }

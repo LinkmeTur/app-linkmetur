@@ -13,6 +13,7 @@ import {
     Button,
     Card,
     CardActionArea,
+    CardActions,
     CardContent,
     CardMedia,
     Divider,
@@ -39,11 +40,11 @@ import ModalCreateOrEditProposal from '../components/modalCreateOrEditProposal.c
 const RFPPrestador: FC = () => {
     const dispatch = useAppDispatch();
     const { usuario } = useAppSelector((state) => state.auth);
-    const { rfpList, proposalList } = useAppSelector((state) => state.jobs);
+    const { rfpList } = useAppSelector((state) => state.jobs);
     const [page, setPage] = useState<number>(1);
     const [limit, setLimit] = useState<number>(10);
 
-    const [resultList, setResultList] = useState<typeof rfpList | typeof proposalList>({
+    const [resultList, setResultList] = useState<typeof rfpList>({
         rfps: [],
         totalPages: 0,
         totalRecords: 0,
@@ -82,17 +83,22 @@ const RFPPrestador: FC = () => {
         dispatch(
             getRfpForPretador({ prestadorID: usuario.corpId as string, page, limit, all: true }),
         );
-    }, []);
+    }, [proposalCreateOrEdit]);
     useEffect(() => {
         if (tipoBusca === 'S' && rfpList && Array.isArray(rfpList.rfps)) {
             setResultList(rfpList);
             return;
         }
-        if (tipoBusca === 'P' && proposalList && Array.isArray(proposalList.proposals)) {
+        if (tipoBusca === 'P' && rfpList && Array.isArray(rfpList.rfps)) {
+            const proposalList = {
+                rfps: rfpList.rfps.filter((rfp) => rfp.proposals.length > 0),
+                totalPages: rfpList.totalPages,
+                totalRecords: rfpList.totalRecords,
+            };
             setResultList(proposalList);
             return;
         }
-    }, [rfpList, proposalList]);
+    }, [rfpList, tipoBusca]);
 
     const handleBuscar = () => {
         console.log('buscar');
@@ -104,9 +110,8 @@ const RFPPrestador: FC = () => {
             page,
             limit,
         };
-        if (tipoBusca === 'S') {
-            dispatch(getRfpForFilter(filter));
-        }
+
+        dispatch(getRfpForFilter(filter));
     };
 
     return (
@@ -193,12 +198,7 @@ const RFPPrestador: FC = () => {
                     >
                         Limpar
                     </Button>
-                    <Button
-                        variant='contained'
-                        color='success'
-                        onClick={handleBuscar}
-                        disabled={!empresa && !tipo && !status}
-                    >
+                    <Button variant='contained' color='success' onClick={handleBuscar}>
                         Buscar
                     </Button>
                 </Box>
@@ -228,11 +228,11 @@ const RFPPrestador: FC = () => {
                     {resultList &&
                         'rfps' in resultList &&
                         Array.isArray(resultList.rfps) &&
-                        resultList.rfps.length &&
+                        !!resultList.rfps.length &&
                         resultList.rfps.map((rfp) => (
                             <Card key={rfp.id} className='mb-4'>
-                                <Stack direction={'row'}>
-                                    <CardContent>
+                                <Stack direction={'row'} justifyContent={'space-between'}>
+                                    <CardContent sx={{ width: '33%' }}>
                                         <Typography gutterBottom variant='h5' component='div'>
                                             Serviço Solicitado: {rfp.titulo}
                                         </Typography>
@@ -273,7 +273,10 @@ const RFPPrestador: FC = () => {
                                     {rfp?.fotos &&
                                         Array.isArray(rfp.fotos) &&
                                         !!rfp.fotos.length && (
-                                            <CardMedia className='flex items-center justify-center gap-2'>
+                                            <CardMedia
+                                                className='flex items-center justify-center gap-3'
+                                                sx={{ width: '33%' }}
+                                            >
                                                 {rfp.fotos.map((foto) => (
                                                     <Box
                                                         component={'button'}
@@ -286,6 +289,9 @@ const RFPPrestador: FC = () => {
                                                                 photo_alt: foto.photo_alt,
                                                             })
                                                         }
+                                                        sx={{
+                                                            cursor: 'pointer',
+                                                        }}
                                                     >
                                                         <Image
                                                             src={foto.photo_URL}
@@ -298,20 +304,21 @@ const RFPPrestador: FC = () => {
                                                 ))}
                                             </CardMedia>
                                         )}
-                                    {rfp.proposals && rfp.proposals.length ? (
-                                        rfp.proposals.map((p) => {
-                                            if (p.prestadorID === usuario.corpId) {
-                                                return (
-                                                    <CardActionArea key={p.id}>
-                                                        <Divider />
-                                                        <Box className='flex items-center justify-between px-6 my-4'>
-                                                            <h2 className='text-lg font-semibold text-gray-500'>
-                                                                Proposta
-                                                            </h2>
-                                                        </Box>
-                                                        <List>
-                                                            <ListItem
-                                                                component='button'
+                                    <CardActions sx={{ width: '33%', overflow: 'auto' }}>
+                                        {rfp.proposals && rfp.proposals.length ? (
+                                            <List sx={{ width: '100%' }}>
+                                                <Box className='flex items-center justify-between px-6 my-4'>
+                                                    <h2 className='text-lg font-semibold '>
+                                                        {usuario.corp?.tipo === 'P'
+                                                            ? 'Proposta'
+                                                            : 'Propostas'}
+                                                    </h2>
+                                                </Box>
+                                                {rfp.proposals.map((p) => {
+                                                    if (p.prestadorID === usuario.corpId) {
+                                                        return (
+                                                            <CardActionArea
+                                                                key={p.id}
                                                                 onClick={() =>
                                                                     setProposalCreateOrEdit({
                                                                         show: true,
@@ -319,146 +326,62 @@ const RFPPrestador: FC = () => {
                                                                         mode: 'edit',
                                                                     })
                                                                 }
+                                                                sx={{
+                                                                    width: '100%',
+                                                                    cursor: 'pointer',
+                                                                }}
                                                             >
-                                                                <ListItemAvatar>
-                                                                    <Avatar>
-                                                                        <LiaBusinessTimeSolid />
-                                                                    </Avatar>
-                                                                </ListItemAvatar>
-                                                                <ListItemText
-                                                                    primary={p.nome_empresa}
-                                                                    secondary={
-                                                                        <Fragment>
-                                                                            <Typography
-                                                                                sx={{
-                                                                                    display:
-                                                                                        'inline',
-                                                                                }}
-                                                                                component='span'
-                                                                                variant='body2'
-                                                                                color='text.primary'
-                                                                            >
-                                                                                {p.resumo_proposta}
-                                                                            </Typography>
-                                                                            {` — ${p.valor_proposta}`}
-                                                                        </Fragment>
-                                                                    }
-                                                                />
-                                                            </ListItem>
-                                                        </List>
-                                                    </CardActionArea>
-                                                );
-                                            }
-                                            return null;
-                                        })
-                                    ) : (
-                                        <Button
-                                            size='small'
-                                            color='success'
-                                            onClick={() =>
-                                                setProposalCreateOrEdit({
-                                                    show: true,
-                                                    rfp,
-                                                    mode: 'createProposal',
-                                                })
-                                            }
-                                        >
-                                            Enviar Proposta
-                                        </Button>
-                                    )}
-                                </Stack>
-                            </Card>
-                        ))}
-                    {resultList &&
-                        'proposals' in resultList &&
-                        Array.isArray(resultList.proposals) &&
-                        resultList.proposals.length &&
-                        resultList.proposals.map((proposal) => (
-                            <Card key={proposal.id} className='mb-4'>
-                                <Stack direction={'row'}>
-                                    <CardContent>
-                                        <Typography gutterBottom variant='h5' component='div'>
-                                            Serviço Solicitado: {proposal.rfp.titulo}
-                                        </Typography>
-                                        <Typography gutterBottom variant='h5' component='div'>
-                                            Empresa: {proposal.nome_empresa}
-                                        </Typography>
-
-                                        <Typography variant='body2' color='text.secondary'>
-                                            {proposal.resumo_proposta}
-                                        </Typography>
-                                        <Typography variant='body2' color='text.secondary'>
-                                            {proposal.observações}
-                                        </Typography>
-                                        <Typography variant='body2' color='text.secondary'>
-                                            {proposal.prazo &&
-                                                (() => {
-                                                    const prazo = new Date(proposal.prazo);
-
-                                                    return (
-                                                        prazo
-                                                            .getDate()
-                                                            .toString()
-                                                            .padStart(2, '0') +
-                                                        '/' +
-                                                        (prazo.getMonth() + 1)
-                                                            .toString()
-                                                            .padStart(2, '0') +
-                                                        '/' +
-                                                        prazo.getFullYear()
-                                                    );
-                                                })()}
-                                        </Typography>
-                                        <Typography variant='body2' color='text.secondary'>
-                                            Status:{proposal.status}
-                                        </Typography>
-                                        <Typography variant='body2' color='text.secondary'>
-                                            {proposal.valor_proposta}
-                                        </Typography>
-                                    </CardContent>
-
-                                    {proposal?.fotos &&
-                                        Array.isArray(proposal.fotos) &&
-                                        !!proposal.fotos.length && (
-                                            <CardMedia className='flex items-center justify-center gap-2'>
-                                                {proposal.fotos.map((foto) => (
-                                                    <Box
-                                                        component={'button'}
-                                                        key={foto.id}
-                                                        onClick={() =>
-                                                            setModalImageCard({
-                                                                open: true,
-                                                                id: foto.id,
-                                                                photo_URL: foto.photo_URL,
-                                                                photo_alt: foto.photo_alt,
-                                                            })
-                                                        }
-                                                    >
-                                                        <Image
-                                                            src={foto.photo_URL}
-                                                            alt={foto.photo_alt}
-                                                            height={100}
-                                                            width={100}
-                                                            className='w-[50px] h-[50px] object-cover rounded-md'
-                                                        />
-                                                    </Box>
-                                                ))}
-                                            </CardMedia>
+                                                                <ListItem className='w-full flex items-center justify-center gap-2'>
+                                                                    <ListItemAvatar>
+                                                                        <Avatar>
+                                                                            <LiaBusinessTimeSolid />
+                                                                        </Avatar>
+                                                                    </ListItemAvatar>
+                                                                    <ListItemText
+                                                                        primary={p.nome_empresa}
+                                                                        secondary={
+                                                                            <Fragment>
+                                                                                <Typography
+                                                                                    sx={{
+                                                                                        display:
+                                                                                            'inline',
+                                                                                    }}
+                                                                                    component='span'
+                                                                                    variant='body2'
+                                                                                    color='text.primary'
+                                                                                >
+                                                                                    {
+                                                                                        p.resumo_proposta
+                                                                                    }
+                                                                                </Typography>
+                                                                                {` — ${p.valor_proposta}`}
+                                                                            </Fragment>
+                                                                        }
+                                                                    />
+                                                                </ListItem>
+                                                            </CardActionArea>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })}
+                                            </List>
+                                        ) : (
+                                            <Button
+                                                size='small'
+                                                color='success'
+                                                fullWidth
+                                                onClick={() =>
+                                                    setProposalCreateOrEdit({
+                                                        show: true,
+                                                        rfp,
+                                                        mode: 'createProposal',
+                                                    })
+                                                }
+                                            >
+                                                Enviar Proposta
+                                            </Button>
                                         )}
-
-                                    <Button
-                                        size='small'
-                                        color='success'
-                                        onClick={() =>
-                                            setProposalCreateOrEdit({
-                                                show: true,
-                                                proposal,
-                                                mode: 'edit',
-                                            })
-                                        }
-                                    >
-                                        Enviar Proposta
-                                    </Button>
+                                    </CardActions>
                                 </Stack>
                             </Card>
                         ))}

@@ -7,8 +7,10 @@ const updateProposal = createAsyncThunk(
     'updateProposal/PUT',
     async (proposal: Partial<IProposal>, { dispatch }) => {
         dispatch(setloading(true));
-        const response = await api.doPatch('/proposal', proposal);
+        const { id, ...newProposal } = proposal;
+        const response = await api.doPatch(`/proposal/${id}`, newProposal);
         dispatch(setloading(false));
+
         return response;
     },
 );
