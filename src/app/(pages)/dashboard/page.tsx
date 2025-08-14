@@ -13,7 +13,6 @@ import {
     FaEnvelope,
 } from 'react-icons/fa';
 import CarFastAction from './components/cardFastActions.component';
-import SearchDash from './components/search-dash/SearchDash.component';
 import CardServiceOrRfp from './components/cardServiceOrRfp.component';
 
 export default function Dashboard() {
@@ -97,9 +96,6 @@ export default function Dashboard() {
                         goPath='/profile'
                     />
                 </div>
-            </section>
-            <section id='search'>
-                <SearchDash />
             </section>
 
             <section id='active-services' className='mb-8'>

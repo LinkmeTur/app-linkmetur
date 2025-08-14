@@ -95,7 +95,7 @@ export default function Register() {
         if (factor === otp) {
             nextStep();
         } else {
-            dispatch(twoFactorRequest({ codeFactor: 'email', data: email }));
+            dispatch(twoFactorRequest({ data: email }));
             setOtp('');
         }
     };
@@ -425,9 +425,9 @@ export default function Register() {
                                 fullWidth
                                 sx={{ mt: 2 }}
                                 onClick={() =>
-                                    dispatch(
-                                        twoFactorRequest({ codeFactor: 'email', data: email }),
-                                    ).then(() => nextStep())
+                                    dispatch(twoFactorRequest({ data: email })).then(() =>
+                                        nextStep(),
+                                    )
                                 }
                             >
                                 Continuar
@@ -461,7 +461,7 @@ export default function Register() {
                             <TextField
                                 label='Digite seu Telefone'
                                 fullWidth
-                                value={phone}
+                                value={formatPhone(phone)}
                                 onChange={(e) => setPhone(e.target.value)}
                             />
                         </Box>
@@ -492,9 +492,16 @@ export default function Register() {
                             <Button variant='outlined' fullWidth sx={{ mt: 2 }} onClick={prevStep}>
                                 Voltar
                             </Button>
-                            <Button variant='contained' fullWidth sx={{ mt: 2 }} onClick={nextStep}>
-                                Continuar
-                            </Button>
+                            {step !== 3 && step !== 4 && step !== 6 && (
+                                <Button
+                                    variant='contained'
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    onClick={nextStep}
+                                >
+                                    Continuar
+                                </Button>
+                            )}
                         </Box>
                     )}
                 </Paper>

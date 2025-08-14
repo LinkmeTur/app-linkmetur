@@ -293,6 +293,8 @@ export default function LinkmeTurAppBar() {
                         onClick={() => {
                             dipatch(clearAuthState());
                             handleMenuClose();
+                            localStorage.removeItem('persist:root');
+                            localStorage.removeItem('tipo');
                             route.push('/');
                         }}
                     >

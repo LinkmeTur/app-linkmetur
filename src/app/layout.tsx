@@ -1,59 +1,41 @@
+// app/layout.tsx
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Inter, Poppins, Roboto, Lato, Source_Sans_3 } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { LinkMeTurAppProvider } from './providers';
 
+// Carregando apenas as fontes principais (Geist é padrão do Vercel/Next)
+// As demais (Poppins, Roboto etc.) serão usadas pontualmente via CSS classes, se necessário
 const geistSans = Geist({
     variable: '--font-geist-sans',
     subsets: ['latin'],
+    display: 'swap', // Evita FOIT
 });
 
 const geistMono = Geist_Mono({
     variable: '--font-geist-mono',
     subsets: ['latin'],
+    display: 'swap',
 });
 
-const inter = Inter({
-    variable: '--font-inter',
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-});
-
-const poppins = Poppins({
-    variable: '--font-poppins',
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-});
-
-const roboto = Roboto({
-    variable: '--font-roboto',
-    subsets: ['latin'],
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-});
-
-const lato = Lato({
-    variable: '--font-lato',
-    subsets: ['latin'],
-    weight: ['100', '300', '400', '700', '900'],
-});
-
-const sourceSansPro = Source_Sans_3({
-    variable: '--font-source-sans-3',
-    subsets: ['latin'],
-});
-
+// Meta tags corrigidas: URLs sem espaços, estrutura limpa
 export const metadata: Metadata = {
-    title: 'LinkMe Tur-App',
+    title: {
+        default: 'LinkMe Tur-App',
+        template: '%s | LinkMe Tur-App',
+    },
     description:
         'Plataforma Web B2B que conecta empresas do setor de turismo, oferecendo serviços e consultoria especializada.',
     icons: {
         icon: '/favicon.ico',
+        shortcut: '/favicon-32x32.png',
+        apple: '/apple-touch-icon.png',
     },
     openGraph: {
         title: 'LinkMe Tur-App - Conectando o Turismo',
         description:
             'Soluções B2B para empresas do setor de turismo. Encontre parceiros, serviços e consultoria especializada.',
-        url: 'https://app.linkmetur.com.br/',
+        url: 'https://app.linkmetur.com.br',
         siteName: 'LinkMe Tur-App',
         images: [
             {
@@ -68,21 +50,17 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'LinkMe Tur-App',
+        title: 'LinkMe Tur-App - Conectando o Turismo',
         description:
             'Plataforma B2B que conecta empresas do setor de turismo, oferecendo serviços e consultoria especializada.',
         images: ['https://app.linkmetur.com.br/thumbnail.png'],
+        site: '@linkmetur',
     },
     alternates: {
-        canonical: 'https://app.linkmetur.com.br/',
+        canonical: 'https://app.linkmetur.com.br',
         languages: {
             'pt-BR': 'https://app.linkmetur.com.br/pt-BR',
         },
-    },
-    formatDetection: {
-        email: false,
-        address: false,
-        telephone: false,
     },
     robots: {
         index: true,
@@ -97,6 +75,11 @@ export const metadata: Metadata = {
             'max-snippet': -1,
         },
     },
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+    },
 };
 
 export default function RootLayout({
@@ -105,10 +88,22 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang='pt-BR'>
+        <html lang='pt-BR' dir='ltr' suppressHydrationWarning>
             <body
-                className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${poppins.variable} ${roboto.variable} ${lato.variable} ${sourceSansPro.variable} antialiased`}
+                className={`
+
+          ${geistSans.variable} 
+          ${geistMono.variable}
+
+          font-sans
+          antialiased
+          
+          text-gray-900
+          
+
+        `}
             >
+                {/* Provider do Toolpad + Auth, Theme, Router, Socket.IO, etc */}
                 <LinkMeTurAppProvider>{children}</LinkMeTurAppProvider>
             </body>
         </html>
