@@ -32,7 +32,7 @@ const LinkMeTurNavigationT = [
         children: [
             {
                 segment: 'rfp',
-                title: 'Minhas Solicitaçoes e Porpostas',
+                title: 'Minhas Solicitaçoes e Propostas',
                 icon: <RiSearchEyeLine />,
             },
 

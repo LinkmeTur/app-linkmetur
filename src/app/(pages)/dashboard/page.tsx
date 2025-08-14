@@ -1,5 +1,5 @@
 'use client';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Pagination, Typography } from '@mui/material';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import CadMetrics from './components/carMetrics';
 import {
@@ -14,8 +14,59 @@ import {
 } from 'react-icons/fa';
 import CarFastAction from './components/cardFastActions.component';
 import CardServiceOrRfp from './components/cardServiceOrRfp.component';
+import { useAppDispatch, useAppSelector } from '@/app/store/hooks/hooks';
+import { useEffect, useState } from 'react';
+import { getJobs, getJobsForCorp } from '@/app/store/reducers/jobs/thunks/getJobs.thunk';
 
 export default function Dashboard() {
+    const dispatch = useAppDispatch();
+    const { serviceList } = useAppSelector((state) => state.jobs);
+    const { usuario } = useAppSelector((state) => state.auth);
+    const [resultList, setResultList] = useState<typeof serviceList>({
+        jobs: [],
+        totalPages: 0,
+        totalRecords: 0,
+    });
+    const filters = useState<{
+        nome_servico: string;
+        categoria: string;
+        localizacao: string;
+        min_valor: number;
+        max_valor: number;
+        min_rating: number;
+        orderBy: 'relevance' | 'rating' | 'price-asc' | 'price-desc';
+    }>({
+        nome_servico: '',
+        categoria: '',
+        localizacao: '',
+        min_rating: 0,
+        min_valor: 0,
+        max_valor: 0,
+        orderBy: 'relevance',
+    });
+    const [page, setPage] = useState<number>(1);
+    const limit = 3;
+    useEffect(() => {
+        if (usuario.corp) {
+            if (usuario.corp.tipo === 'T') {
+                dispatch(getJobs({ ...filters, page, limit }));
+                return;
+            }
+            dispatch(
+                getJobsForCorp({
+                    corpId: usuario.corpId as string,
+                    ...filters,
+                    page,
+                    limit,
+                }),
+            );
+        }
+    }, [page, limit]);
+    useEffect(() => {
+        if (serviceList) {
+            setResultList(serviceList);
+        }
+    }, [serviceList]);
     return (
         <PageContainer title={''} breadcrumbs={[]}>
             <section id='key-metrics' className='mb-8'>
@@ -70,9 +121,9 @@ export default function Dashboard() {
                     <CarFastAction
                         icon={<FaPlus />}
                         iconColor='emerald'
-                        title='Cadastrar Serviço'
+                        title={usuario.corp?.tipo === 'P' ? 'Cadastrar Serviço' : 'Cadastrar RFP'}
                         subTitle='Adicione um novo serviço'
-                        goPath='/myServices/registerService'
+                        goPath={usuario.corp?.tipo === 'P' ? '/myServices/registerService' : '/rfp'}
                     />
                     <CarFastAction
                         icon={<FaTag />}
@@ -112,24 +163,46 @@ export default function Dashboard() {
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                    <CardServiceOrRfp
-                        imageUrl='https://storage.googleapis.com/uxpilot-auth.appspot.com/35cdc99b4e-81ebe374d136c68e8a8b.png'
-                        imageAlt='oi'
-                        title='Fotografia Profissional para Hotelaria'
-                        description='Serviço de fotografia especializada para hotéis, pousadas e resorts. Realce a beleza do seu estabelecimento.'
-                        price='R$ 1.800,00'
-                        status={{
-                            label: 'Disponível',
-                            color: 'success',
+                    {resultList &&
+                        Array.isArray(resultList.jobs) &&
+                        resultList.jobs.length > 0 &&
+                        resultList.jobs.map((service) => (
+                            <CardServiceOrRfp
+                                key={service.id}
+                                imageUrl={
+                                    service.photos[0]?.photo_URL || '/images/default-service.jpg'
+                                }
+                                imageAlt={service.nome_servico}
+                                title={service.nome_servico}
+                                description={service.descricao}
+                                price={
+                                    service.min_valor > 0
+                                        ? `R$ ${service.min_valor.toFixed(2)} - R$ ${service.max_valor.toFixed(2)}`
+                                        : 'Gratuito'
+                                }
+                                status={{
+                                    label: 'Disponível',
+                                    color: 'success',
+                                }}
+                                category={{
+                                    label: `${service.categoria}`,
+                                    color: 'primary',
+                                    subCategory: {
+                                        label: `${service.sub_categoria}`,
+                                        color: 'secondary',
+                                    },
+                                }}
+                            />
+                        ))}
+                </div>
+                <div id='pagination' className='flex items-center justify-center mt-6'>
+                    <Pagination
+                        count={resultList.totalPages}
+                        page={page}
+                        onChange={(e, value) => {
+                            setPage(value);
                         }}
-                        category={{
-                            label: `Marketing`,
-                            color: 'primary',
-                            subCategory: {
-                                label: `Fotografia`,
-                                color: 'secondary',
-                            },
-                        }}
+                        shape='rounded'
                     />
                 </div>
             </section>
